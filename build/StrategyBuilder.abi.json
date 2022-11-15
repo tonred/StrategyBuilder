@@ -1,0 +1,92 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"owner","type":"address"},
+				{"name":"platformCode","type":"cell"},
+				{"name":"strategyCode","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "createStrategy",
+			"inputs": [
+				{"name":"answerId","type":"uint32"},
+				{"components":[{"name":"owner","type":"address"},{"components":[{"name":"kind","type":"uint8"},{"name":"params","type":"cell"},{"name":"childID","type":"uint32"},{"name":"nextID","type":"uint32"}],"name":"commands","type":"map(uint32,tuple)"},{"name":"inputs","type":"map(uint256,uint32)"}],"name":"data","type":"tuple"},
+				{"name":"tokens","type":"address[]"}
+			],
+			"outputs": [
+				{"name":"strategy","type":"address"}
+			]
+		},
+		{
+			"name": "calcAddress",
+			"inputs": [
+				{"name":"stateInit","type":"cell"}
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "_randomNonce",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"_randomNonce","type":"uint256"}
+			]
+		},
+		{
+			"name": "_owner",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"_owner","type":"address"}
+			]
+		},
+		{
+			"name": "_platformCode",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"_platformCode","type":"cell"}
+			]
+		},
+		{
+			"name": "_strategyCode",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"_strategyCode","type":"cell"}
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"_randomNonce","type":"uint256"}
+	],
+	"events": [
+		{
+			"name": "NewStrategy",
+			"inputs": [
+				{"name":"strategy","type":"address"},
+				{"name":"owner","type":"address"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"_randomNonce","type":"uint256"},
+		{"name":"_owner","type":"address"},
+		{"name":"_platformCode","type":"cell"},
+		{"name":"_strategyCode","type":"cell"}
+	]
+}

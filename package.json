@@ -1,0 +1,38 @@
+{
+  "name": "cardano-everscale-bridge-contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "setup": "npm install",
+    "build": "export $(cat .env | xargs) && locklift build --config locklift.config.js",
+    "test": "locklift test --test test/ --config locklift.config.js --network local --disable-build",
+    "deploy-bridge": "locklift run -s scripts/deploy-bridge.js --config locklift.config.js --network local --disable-build",
+    "deploy-account": "locklift run -s scripts/deploy-account.js --config locklift.config.js --network local --disable-build",
+    "deploy-token-factory": "locklift run -s scripts/deploy-token-factory.js --config locklift.config.js --network local --disable-build",
+    "deploy-wton": "locklift run -s scripts/deploy-wton.js --config locklift.config.js --network local --disable-build",
+    "deploy-dex": "locklift run -s scripts/deploy-dex.js --config locklift.config.js --network local --disable-build",
+    "deploy-test-credit-liqudity": "locklift run -s scripts/deploy-credit-liquidity.js --config locklift.config.js --network local --disable-build",
+    "all": "npm run deploy-account && npm run deploy-token-factory && npm run deploy-wton && npm run deploy-dex && npm run deploy-bridge && npm run deploy-test-credit-liqudity",
+    "update-contracts": "locklift run -s scripts/update-codes.js --config locklift.config.js --network local --disable-build",
+    "prod": "locklift run -s scripts/deploy-account.js --config locklift.config.js --network local --disable-build && locklift run -s scripts/deploy-prod.js --config locklift.config.js --network local --disable-build"
+  },
+  "author": "TONRED",
+  "license": "ISC",
+  "dependencies": {
+    "bignumber.js": "^9.0.1",
+    "directory-tree": "^3.0.1",
+    "dotenv": "^10.0.0",
+    "folder-hash": "^4.0.1",
+    "mocha": "^9.1.3",
+    "mocha-logger": "^1.0.7",
+    "tip3": "git://github.com/broxus/tip3#6503e61880c03fb45741c177c25f4955dca5f0df",
+    "flatqube": "https://github.com/broxus/flatqube-contracts#c8a72baef546e31ae881c803d710cb5bd638c9cd"
+  },
+  "devDependencies": {
+    "@broxus/contracts": "^1.0.3",
+    "chai": "^4.3.4",
+    "chai-bignumber": "^3.0.0",
+    "locklift": "^1.5.2"
+  }
+}

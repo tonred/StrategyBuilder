@@ -1,0 +1,15 @@
+.idea/
+**/.DS_Store
+
+node_modules/
+venv/
+
+package-lock.json
+locklift.config.js
+
+
+*.log
+.env
+artifacts/
+
+migration-log.json

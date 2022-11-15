@@ -1,0 +1,70 @@
+// kinds
+// 0 - exit
+// 1 - onAccept
+// 2 - call another strategy
+// 3 - add to pool
+// 4 - transfer
+// 5 - add lp to farm
+
+{
+  // onAccept USDT
+  "1": {
+    "kind": 1,
+    "params": "cell...",
+    "callbackID": 0,
+    "nextID": 123
+  },
+  // onAccept USDC
+  "2": {
+    "kind": 1,
+    "params": "cell...",
+    "callbackID": 0,
+    "nextID": 123
+  },
+  // ... onAccept other tokens
+
+  // Send to Any2wever
+  "123": {
+    "kind": 2,
+    "params": "cell...",
+    "callbackID": 124,
+    "nextID": 0
+  },
+
+  // Exit
+  "124": {
+    "kind": 0,
+    "params": "cell...",
+    "callbackID": 0,
+    "nextID": 0
+  },
+
+  // onAccept WEVER
+  "125": {
+    "kind": 1,
+    "params": "cell...",
+    "callbackID": 0,
+    "nextID": 126
+  },
+  // Add 95% WEVER to pool WEVER/INK
+  "126": {
+    "kind": 3 ,
+    "params": "cell...",
+    "callbackID": 128,
+    "nextID": 127
+  },
+  // Send 5% WEVER to <FEE ADDRESS>
+  "127": {
+    "kind": 4 ,
+    "params": "cell...",
+    "callbackID": 0,
+    "nextID": 0
+  },
+  // Add LP-WEVER-INK to pool <ADDRESS>
+  "128": {
+    "kind": 5 ,
+    "params": "cell...",
+    "callbackID": 0,
+    "nextID": 0
+  }
+}

@@ -1,0 +1,271 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "changeOwner",
+			"inputs": [
+				{"name":"newOwner","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onAcceptTokensTransfer",
+			"inputs": [
+				{"name":"token","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"sender","type":"address"},
+				{"name":"value3","type":"address"},
+				{"name":"value4","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onAcceptTokensMint",
+			"inputs": [
+				{"name":"token","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"value2","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "trigger",
+			"inputs": [
+				{"name":"amount","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "encodeFarmActionData",
+			"inputs": [
+				{"name":"token","type":"address"},
+				{"components":[{"name":"kind","type":"uint8"},{"name":"value","type":"uint128"}],"name":"amount","type":"tuple"},
+				{"name":"farm","type":"address"},
+				{"components":[{"name":"value","type":"address"}],"name":"depositOwner","type":"tuple"},
+				{"name":"lockTime","type":"uint32"},
+				{"name":"value","type":"uint128"},
+				{"name":"flag","type":"uint8"}
+			],
+			"outputs": [
+				{"name":"encoded","type":"cell"}
+			]
+		},
+		{
+			"name": "decodeFarmActionData",
+			"inputs": [
+				{"name":"params","type":"cell"},
+				{"components":[{"components":[{"name":"sender","type":"address"},{"name":"parentID","type":"uint32"},{"name":"childID","type":"uint32"}],"name":"callData","type":"tuple"},{"name":"total","type":"uint128"},{"name":"spent","type":"uint128"}],"name":"data","type":"tuple"}
+			],
+			"outputs": [
+				{"components":[{"name":"token","type":"address"},{"name":"amount","type":"uint128"},{"name":"farm","type":"address"},{"name":"remainingGasTo","type":"address"},{"name":"depositOwner","type":"address"},{"name":"lockTime","type":"uint32"},{"name":"value","type":"uint128"},{"name":"flag","type":"uint8"}],"name":"decoded","type":"tuple"}
+			]
+		},
+		{
+			"name": "encodeDepositActionData",
+			"inputs": [
+				{"name":"token","type":"address"},
+				{"components":[{"name":"kind","type":"uint8"},{"name":"value","type":"uint128"}],"name":"amount","type":"tuple"},
+				{"name":"pair","type":"address"},
+				{"name":"value","type":"uint128"},
+				{"name":"flag","type":"uint8"}
+			],
+			"outputs": [
+				{"name":"encoded","type":"cell"}
+			]
+		},
+		{
+			"name": "decodeDepositActionData",
+			"inputs": [
+				{"name":"params","type":"cell"},
+				{"components":[{"components":[{"name":"sender","type":"address"},{"name":"parentID","type":"uint32"},{"name":"childID","type":"uint32"}],"name":"callData","type":"tuple"},{"name":"total","type":"uint128"},{"name":"spent","type":"uint128"}],"name":"data","type":"tuple"}
+			],
+			"outputs": [
+				{"components":[{"name":"token","type":"address"},{"name":"amount","type":"uint128"},{"name":"pair","type":"address"},{"name":"remainingGasTo","type":"address"},{"name":"value","type":"uint128"},{"name":"flag","type":"uint8"}],"name":"decoded","type":"tuple"}
+			]
+		},
+		{
+			"name": "encodeSwapActionData",
+			"inputs": [
+				{"name":"token","type":"address"},
+				{"components":[{"name":"kind","type":"uint8"},{"name":"value","type":"uint128"}],"name":"amount","type":"tuple"},
+				{"name":"pair","type":"address"},
+				{"name":"value","type":"uint128"},
+				{"name":"flag","type":"uint8"}
+			],
+			"outputs": [
+				{"name":"encoded","type":"cell"}
+			]
+		},
+		{
+			"name": "decodeSwapActionData",
+			"inputs": [
+				{"name":"params","type":"cell"},
+				{"components":[{"components":[{"name":"sender","type":"address"},{"name":"parentID","type":"uint32"},{"name":"childID","type":"uint32"}],"name":"callData","type":"tuple"},{"name":"total","type":"uint128"},{"name":"spent","type":"uint128"}],"name":"data","type":"tuple"}
+			],
+			"outputs": [
+				{"components":[{"name":"token","type":"address"},{"name":"amount","type":"uint128"},{"name":"pair","type":"address"},{"name":"remainingGasTo","type":"address"},{"name":"value","type":"uint128"},{"name":"flag","type":"uint8"}],"name":"decoded","type":"tuple"}
+			]
+		},
+		{
+			"name": "encodeTransferActionData",
+			"inputs": [
+				{"name":"token","type":"address"},
+				{"components":[{"name":"kind","type":"uint8"},{"name":"value","type":"uint128"}],"name":"amount","type":"tuple"},
+				{"components":[{"name":"value","type":"address"}],"name":"recipient","type":"tuple"},
+				{"name":"isDeployWallet","type":"bool"},
+				{"name":"payload","type":"cell"},
+				{"name":"value","type":"uint128"},
+				{"name":"flag","type":"uint8"}
+			],
+			"outputs": [
+				{"name":"encoded","type":"cell"}
+			]
+		},
+		{
+			"name": "decodeTransferActionData",
+			"inputs": [
+				{"name":"params","type":"cell"},
+				{"components":[{"components":[{"name":"sender","type":"address"},{"name":"parentID","type":"uint32"},{"name":"childID","type":"uint32"}],"name":"callData","type":"tuple"},{"name":"total","type":"uint128"},{"name":"spent","type":"uint128"}],"name":"data","type":"tuple"}
+			],
+			"outputs": [
+				{"components":[{"name":"token","type":"address"},{"name":"amount","type":"uint128"},{"name":"recipient","type":"address"},{"name":"isDeployWallet","type":"bool"},{"name":"remainingGasTo","type":"address"},{"name":"payload","type":"cell"},{"name":"value","type":"uint128"},{"name":"flag","type":"uint8"},{"name":"force","type":"bool"}],"name":"decoded","type":"tuple"}
+			]
+		},
+		{
+			"name": "onWalletDeployed",
+			"inputs": [
+				{"name":"wallet","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getWallet",
+			"inputs": [
+				{"name":"token","type":"address"}
+			],
+			"outputs": [
+				{"name":"wallet","type":"address"}
+			]
+		},
+		{
+			"name": "constructor",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "_pendingWallets",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"_pendingWallets","type":"map(address,bool)"}
+			]
+		},
+		{
+			"name": "_wallets",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"_wallets","type":"map(address,address)"}
+			]
+		},
+		{
+			"name": "_balances",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"_balances","type":"map(address,uint128)"}
+			]
+		},
+		{
+			"name": "_root",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"_root","type":"address"}
+			]
+		},
+		{
+			"name": "_owner",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"_owner","type":"address"}
+			]
+		},
+		{
+			"name": "_commands",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"kind","type":"uint8"},{"name":"params","type":"cell"},{"name":"childID","type":"uint32"},{"name":"nextID","type":"uint32"}],"name":"_commands","type":"map(uint32,tuple)"}
+			]
+		},
+		{
+			"name": "_inputs",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"_inputs","type":"map(uint256,uint32)"}
+			]
+		}
+	],
+	"data": [
+	],
+	"events": [
+		{
+			"name": "ChangedOwner",
+			"inputs": [
+				{"name":"oldOwner","type":"address"},
+				{"name":"newOwner","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "ExecuteCommand",
+			"inputs": [
+				{"name":"id","type":"uint32"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "ExecuteInput",
+			"inputs": [
+				{"name":"id","type":"uint32"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "ReturnTokens",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		}
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"_pendingWallets","type":"map(address,bool)"},
+		{"name":"_wallets","type":"map(address,address)"},
+		{"name":"_balances","type":"map(address,uint128)"},
+		{"name":"_root","type":"address"},
+		{"name":"_owner","type":"address"},
+		{"components":[{"name":"kind","type":"uint8"},{"name":"params","type":"cell"},{"name":"childID","type":"uint32"},{"name":"nextID","type":"uint32"}],"name":"_commands","type":"map(uint32,tuple)"},
+		{"name":"_inputs","type":"map(uint256,uint32)"}
+	]
+}
