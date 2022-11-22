@@ -19,10 +19,12 @@ const main = async () => {
       strategyCode: Strategy.code,
     },
     initParams: {
-      randomNonce: locklift.utils.getRandomNonce(),
+      // _randomNonce: locklift.utils.getRandomNonce(),
+      _randomNonce: 69,
     },
     keyPair
-  }, locklift.utils.convertCrystal(5, 'nano'));
+  }, locklift.utils.convertCrystal(3, 'nano'));
+  console.log(builder.address);
   await logContract(builder);
 };
 

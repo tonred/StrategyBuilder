@@ -7,15 +7,7 @@
     "setup": "npm install",
     "build": "export $(cat .env | xargs) && locklift build --config locklift.config.js",
     "test": "locklift test --test test/ --config locklift.config.js --network local --disable-build",
-    "deploy-bridge": "locklift run -s scripts/deploy-bridge.js --config locklift.config.js --network local --disable-build",
-    "deploy-account": "locklift run -s scripts/deploy-account.js --config locklift.config.js --network local --disable-build",
-    "deploy-token-factory": "locklift run -s scripts/deploy-token-factory.js --config locklift.config.js --network local --disable-build",
-    "deploy-wton": "locklift run -s scripts/deploy-wton.js --config locklift.config.js --network local --disable-build",
-    "deploy-dex": "locklift run -s scripts/deploy-dex.js --config locklift.config.js --network local --disable-build",
-    "deploy-test-credit-liqudity": "locklift run -s scripts/deploy-credit-liquidity.js --config locklift.config.js --network local --disable-build",
-    "all": "npm run deploy-account && npm run deploy-token-factory && npm run deploy-wton && npm run deploy-dex && npm run deploy-bridge && npm run deploy-test-credit-liqudity",
-    "update-contracts": "locklift run -s scripts/update-codes.js --config locklift.config.js --network local --disable-build",
-    "prod": "locklift run -s scripts/deploy-account.js --config locklift.config.js --network local --disable-build && locklift run -s scripts/deploy-prod.js --config locklift.config.js --network local --disable-build"
+    "deploy-bridge": "locklift run -s scripts/deploy-builder.js --config locklift.config.js --network local --disable-build"
   },
   "author": "TONRED",
   "license": "ISC",
