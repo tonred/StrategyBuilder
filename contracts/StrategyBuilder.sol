@@ -42,9 +42,10 @@ contract StrategyBuilder is TransferUtils, RandomNonce {
         TvmCell initialParams = abi.encode(tokens);
         TvmCell initialData = _buildStrategyInitialData(data);
         TvmCell stateInit = _buildPlatformStateInit(PlatformType.STRATEGY, initialData);
+        uint128 value = Gas.STRATEGY_VALUE + uint128(tokens.length) * Gas.DEPLOY_WALLET_TOTAL;
         strategy = new Platform{
             stateInit: stateInit,
-            value: Gas.STRATEGY_VALUE,
+            value: value,
             flag: MsgFlag.SENDER_PAYS_FEES,
             bounce: true
         }(_strategyCode, initialParams);
