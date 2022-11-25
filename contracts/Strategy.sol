@@ -10,6 +10,7 @@ import "./commands/actions/Swap.sol";
 import "./commands/actions/Transfer.sol";
 import "./commands/inputs/TokenInput.sol";
 import "./commands/Command.sol";
+import "./interfaces/IOwner.sol";
 import "./utils/TransferUtils.sol";
 
 
@@ -26,16 +27,29 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
     mapping(uint256 /*hash*/ => uint32 /*id*/) public _inputs;
 
 
+    modifier onlyOwner() {
+        require(msg.sender == _owner, ErrorCodes.IS_NOT_OWNER);
+        _;
+    }
+
+
     function onCodeUpgrade(TvmCell input, bool upgrade) internal {
         if (!upgrade) {
+            _reserve();
             tvm.resetStorage();
             (address root, TvmCell initialData, TvmCell initialParams) =
                 abi.decode(input, (address, TvmCell, TvmCell));
             _root = root;
-            (_owner, _commands, _inputs, /*uint64 nonce*/) =
+            uint64 nonce;
+            (_owner, _commands, _inputs, nonce) =
                 abi.decode(initialData, (address, mapping(uint32 => Command), mapping(uint256 => uint32), uint64));
             address[] tokens = abi.decode(initialParams, address[]);
             _createWallets(tokens);
+            IOwner(_owner).onStrategyCreated{
+                value: 0,
+                flag: MsgFlag.ALL_NOT_RESERVED,
+                bounce: false
+            }(address(this), nonce);
         } else {
             // todo versions
             // revert(VersionableErrorCodes.INVALID_OLD_VERSION);
@@ -48,6 +62,15 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
         }
         emit ChangedOwner(_owner, newOwner);
         _owner = newOwner;
+    }
+
+    function withdraw(address token, uint128 amount, bool force) public onlyOwner {
+        _reserve();
+        _returnTokens(token, _owner, amount, force);
+    }
+
+    function claim() public onlyOwner {
+        // todo
     }
 
 
@@ -109,21 +132,22 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
     }
 
     function _onInput(InputKind kind, address token, address sender, uint128 amount, uint128 gas) private {
-        uint256 hash = TokenInput.hashTokenInput(kind, token, AddressExtended(sender));
+        AddressExtended senderExtended = ExtendedTypes.createAddressExtended(AddressExtendedKind.VALUE, sender);
+        uint256 hash = TokenInput.hashTokenInput(kind, token, senderExtended);
         if (!_inputs.exists(hash)) {
-            AddressExtended anySender = ExtendedTypes.createAddressExtended(null);
+            AddressExtended anySender = ExtendedTypes.createAddressExtended(AddressExtendedKind.SENDER, address(0));
             hash = TokenInput.hashTokenInput(kind, token, anySender);
             if (!_inputs.exists(hash)) {
                 // todo try-catch ?
 //                revert(ErrorCodes.INVALID_INPUT);
-                _returnTokens(token, sender, amount);
+                _returnTokens(token, sender, amount, false);
                 return;
             }
         }
         uint32 id = _inputs[hash];
         Command command = _getCommand(id);
         TokenInputData tokenInputData = TokenInput.decodeTokenInputData(command.params);
-        TokenInput._checkTokenInput(tokenInputData, sender, amount, gas);
+        TokenInput._checkTokenInput(tokenInputData, amount, gas);
         emit ExecuteInput(id);
         CallData callData = CallData(sender, 0, command.nextID);
         ExecutionData executionData = ExecutionData(callData, token, amount, 0);
@@ -159,7 +183,7 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
             return;
         }
         if (kind == CommandKind.TRANSFER) {
-            TransferActionData data = TransferAction.decodeTransferActionData(command.params, executionData);
+            TransferActionData data = TransferAction.decodeTransferActionData(command.params, executionData, _owner);
             _transfer(data);
         } else if (kind == CommandKind.SWAP) {
             SwapActionData data = SwapAction.decodeSwapActionData(command.params, executionData);
@@ -170,7 +194,7 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
             TvmCell meta = _encodeNextCallData(command, executionData.callData);
             _deposit(data, meta);
         } else if (kind == CommandKind.FARM) {
-            FarmActionData data = FarmAction.decodeFarmActionData(command.params, executionData);
+            FarmActionData data = FarmAction.decodeFarmActionData(command.params, executionData, _owner);
             _farm(data);
         }
     }
@@ -189,7 +213,7 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
         return _commands[id];
     }
 
-    function _returnTokens(address token, address sender, uint128 amount) private {
+    function _returnTokens(address token, address sender, uint128 amount, bool force) private {
         emit ReturnTokens();
         if (token.isNone()) {
             sender.transfer({value: 0, flag: MsgFlag.ALL_NOT_RESERVED, bounce: false});
@@ -204,7 +228,7 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
                 payload: empty,
                 value: 0,
                 flag: MsgFlag.ALL_NOT_RESERVED,
-                force: false
+                force: force
             }));
         }
     }

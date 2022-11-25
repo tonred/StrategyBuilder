@@ -9,13 +9,11 @@ import "../../utils/ExtendedTypes.sol";
 
 
 struct TokenInputData {
-    AddressExtended sender;
     uint128 minAmount;
     uint128 minGas;
 }
 
 
-// todo can be library?
 abstract contract TokenInput {
 
     function hashTokenInput(InputKind kind, address token, AddressExtended sender) public pure returns (uint256 hash) {
@@ -23,18 +21,17 @@ abstract contract TokenInput {
         return tvm.hash(cell);
     }
 
-    function encodeTokenInputData(address sender, uint128 minAmount, uint128 minGas) public pure returns (TvmCell encoded) {
-        return abi.encode(sender, minAmount, minGas);
+    function encodeTokenInputData(uint128 minAmount, uint128 minGas) public pure returns (TvmCell encoded) {
+        return abi.encode(minAmount, minGas);
     }
 
     function decodeTokenInputData(TvmCell params) public pure returns (TokenInputData data) {
-        (AddressExtended sender, uint128 minAmount, uint128 minGas) = abi.decode(params, (AddressExtended, uint128, uint128));
-        return TokenInputData(sender, minAmount, minGas);
+        (uint128 minAmount, uint128 minGas) = abi.decode(params, (uint128, uint128));
+        return TokenInputData(minAmount, minGas);
     }
 
-    function _checkTokenInput(TokenInputData data, address sender, uint128 amount, uint128 gas) internal pure {
-        address expectedSender = ExtendedTypes.decodeAddressExtended(data.sender, sender);
-        require(expectedSender == sender && amount >= data.minAmount && gas >= data.minGas, ErrorCodes.INVALID_INPUT);
+    function _checkTokenInput(TokenInputData data, uint128 amount, uint128 gas) internal pure {
+        require(amount >= data.minAmount && gas >= data.minGas, ErrorCodes.INVALID_INPUT);
     }
 
 }

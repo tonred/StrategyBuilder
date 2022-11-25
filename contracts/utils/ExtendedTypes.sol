@@ -5,8 +5,13 @@ import "./Constants.sol";
 import "./ErrorCodes.sol";
 
 
+enum AddressExtendedKind {
+    VALUE, SENDER, OWNER
+}
+
 struct AddressExtended {
-    address value;  // address.makeAddrNone() in case of `SENDER`
+    AddressExtendedKind kind;
+    address value;
 }
 
 enum AmountExtendedKind {
@@ -21,8 +26,11 @@ struct AmountExtended {
 
 library ExtendedTypes {
 
-    function createAddressExtended(optional(address) value) public returns (AddressExtended extended) {
-        return value.hasValue() ? AddressExtended(value.get()) : AddressExtended(address.makeAddrNone());
+    function createAddressExtended(AddressExtendedKind kind, address value) public returns (AddressExtended extended) {
+        if (kind != AddressExtendedKind.VALUE) {
+            value = address(0);
+        }
+        return AddressExtended(kind, value);
     }
 
     function createAmountExtended(AmountExtendedKind kind, uint128 value) public returns (AmountExtended extended) {
@@ -30,22 +38,28 @@ library ExtendedTypes {
         return AmountExtended(kind, value);
     }
 
-    function decodeAddressExtended(AddressExtended extended, address sender) public returns (address decoded) {
-        if (extended.value.isNone()) {
-            return sender;
-        } else {
+    function decodeAddressExtended(AddressExtended extended, address sender, address owner) public returns (address decoded) {
+        AddressExtendedKind kind = extended.kind;
+        if (kind == AddressExtendedKind.VALUE) {
             return extended.value;
+        } else if (kind == AddressExtendedKind.SENDER) {
+            return sender;
+        } else if (kind == AddressExtendedKind.OWNER) {
+            return owner;
+        } else {
+            revert(ErrorCodes.INVALID_EXTENDED_TYPE);
         }
     }
 
     function decodeAmountExtended(AmountExtended extended, ExecutionData data) public returns (uint128 decoded) {
-        if (extended.kind == AmountExtendedKind.VALUE) {
+        AmountExtendedKind kind = extended.kind;
+        if (kind == AmountExtendedKind.VALUE) {
             return extended.value;
-        } else if (extended.kind == AmountExtendedKind.PERCENT) {
+        } else if (kind == AmountExtendedKind.PERCENT) {
             uint128 value = math.muldiv(data.amount, extended.value, Constants.PERCENT_DENOMINATOR);
             data.spent += value;
             return value;
-        } else if (extended.kind == AmountExtendedKind.REMAINING) {
+        } else if (kind == AmountExtendedKind.REMAINING) {
             return (data.amount > data.spent) ? (data.amount - data.spent) : 0;
         } else {
             revert(ErrorCodes.INVALID_EXTENDED_TYPE);

@@ -58,7 +58,7 @@ contract StrategyBuilder is TransferUtils, RandomNonce {
             bounce: true
         }(_strategyCode, initialParams);
         emit NewStrategy(strategy, data.owner);
-        return {value: 0, flag: MsgFlag.SENDER_PAYS_FEES, bounce: false} strategy;
+        return {value: 0, flag: MsgFlag.ALL_NOT_RESERVED, bounce: false} strategy;
     }
 
     function checkStrategy(StrategyData data) public pure {

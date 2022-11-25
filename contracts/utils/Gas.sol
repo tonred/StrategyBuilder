@@ -6,7 +6,7 @@ library Gas {
     uint128 constant DEPLOY_WALLET_VALUE = 0.1 ever;
     uint128 constant DEPLOY_WALLET_GRAMS = 0.1 ever;
     uint128 constant DEPLOY_WALLET_TOTAL = 0.3 ever;
-    uint128 constant STRATEGY_VALUE = 1 ever;
+    uint128 constant STRATEGY_VALUE = 0.7 ever;
     uint128 constant STRATEGY_BUILDER_TARGET_BALANCE = 1 ever;
     uint128 constant STRATEGY_TARGET_BALANCE = 0.5 ever;
 

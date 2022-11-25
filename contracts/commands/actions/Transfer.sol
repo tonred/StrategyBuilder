@@ -41,12 +41,12 @@ abstract contract TransferAction is WalletManager {
         return abi.encode(amount, recipient, isDeployWallet, payload, value, flag);
     }
 
-    function decodeTransferActionData(TvmCell params, ExecutionData data) public pure returns (TransferActionData decoded) {
+    function decodeTransferActionData(TvmCell params, ExecutionData data, address owner) public pure returns (TransferActionData decoded) {
         (AmountExtended amount, AddressExtended recipient, bool isDeployWallet, TvmCell payload, uint128 value, uint8 flag) =
             abi.decode(params, (AmountExtended, AddressExtended, bool, TvmCell, uint128, uint8));
         address sender = data.callData.sender;
         uint128 amountDecoded = ExtendedTypes.decodeAmountExtended(amount, data);
-        address recipientDecoded = ExtendedTypes.decodeAddressExtended(recipient, sender);
+        address recipientDecoded = ExtendedTypes.decodeAddressExtended(recipient, sender, owner);
         return TransferActionData(data.token, amountDecoded, recipientDecoded, isDeployWallet, sender, payload, value, flag, false);
     }
 
