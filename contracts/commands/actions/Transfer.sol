@@ -51,8 +51,11 @@ abstract contract TransferAction is WalletManager {
     }
 
     function _transfer(TransferActionData data) internal {
+        if (data.amount == 0) {
+            return;
+        }
         if (!data.force) {
-            require(data.amount != 0 && _balances[data.token] >= data.amount, ErrorCodes.WRONG_AMOUNT);
+            require(_balances[data.token] >= data.amount, ErrorCodes.WRONG_AMOUNT);
             _balances[data.token] -= data.amount;
         } else {
             _balances[data.token] = 0;

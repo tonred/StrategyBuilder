@@ -22,7 +22,7 @@ struct StrategyData {
 
 contract StrategyBuilder is TransferUtils, RandomNonce {
 
-    event NewStrategy(address strategy, address owner);
+    event CreatedStrategy(address strategy, address owner);
 
 
     address public _owner;
@@ -43,22 +43,28 @@ contract StrategyBuilder is TransferUtils, RandomNonce {
         _strategyCode = strategyCode;
     }
 
+    function expectedStrategyValue(uint32 tokensCount) public pure responsible returns (uint128 value) {
+        value = Gas.STRATEGY_VALUE + tokensCount * Gas.DEPLOY_WALLET_TOTAL;
+        return {value: 0, flag: MsgFlag.REMAINING_GAS, bounce: false} value;
+    }
+
     // todo tokens must be checked, but how... (no checks = broken strategy with same address)
-    function createStrategy(StrategyData data, address[] tokens, uint64 nonce) public view responsible returns (address strategy) {
+    function createStrategy(
+        StrategyData data, uint64 nonce, address callbackTo
+    ) public view minValue(Gas.STRATEGY_VALUE) returns (address strategy) {
         _reserve();
         checkStrategy(data);
-        TvmCell initialParams = abi.encode(tokens);
+        TvmCell initialParams = abi.encode(callbackTo);
         TvmCell initialData = _buildStrategyInitialData(data, nonce);
         TvmCell stateInit = _buildPlatformStateInit(PlatformType.STRATEGY, initialData);
-        uint128 value = Gas.STRATEGY_VALUE + uint128(tokens.length) * Gas.DEPLOY_WALLET_TOTAL;
         strategy = new Platform{
             stateInit: stateInit,
-            value: value,
-            flag: MsgFlag.SENDER_PAYS_FEES,
+            value: 0,
+            flag: MsgFlag.ALL_NOT_RESERVED,
             bounce: true
         }(_strategyCode, initialParams);
-        emit NewStrategy(strategy, data.owner);
-        return {value: 0, flag: MsgFlag.ALL_NOT_RESERVED, bounce: false} strategy;
+        emit CreatedStrategy(strategy, data.owner);
+        return strategy;
     }
 
     function checkStrategy(StrategyData data) public pure {
@@ -106,6 +112,14 @@ contract StrategyBuilder is TransferUtils, RandomNonce {
 
     function _targetBalance() internal view inline override returns (uint128) {
         return Gas.STRATEGY_BUILDER_TARGET_BALANCE;
+    }
+
+
+    onBounce(TvmSlice body) external pure {
+        uint32 functionId = body.decode(uint32);
+        if (functionId == tvm.functionId(Platform)) {
+            // strategy already exist
+        }
     }
 
 }

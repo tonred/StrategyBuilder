@@ -26,6 +26,9 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
     mapping(uint32 /*id*/ => Command) public _commands;
     mapping(uint256 /*hash*/ => uint32 /*id*/) public _inputs;
 
+    // in execute
+    ExecutionData _executionData;
+
 
     modifier onlyOwner() {
         require(msg.sender == _owner, ErrorCodes.IS_NOT_OWNER);
@@ -43,9 +46,10 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
             uint64 nonce;
             (_owner, _commands, _inputs, nonce) =
                 abi.decode(initialData, (address, mapping(uint32 => Command), mapping(uint256 => uint32), uint64));
-            address[] tokens = abi.decode(initialParams, address[]);
+            address[] tokens = extractTokens();
             _createWallets(tokens);
-            IOwner(_owner).onStrategyCreated{
+            address callbackTo = abi.decode(initialParams, address);
+            IOwner(callbackTo).onStrategyCreated{
                 value: 0,
                 flag: MsgFlag.ALL_NOT_RESERVED,
                 bounce: false
@@ -54,6 +58,26 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
             // todo versions
             // revert(VersionableErrorCodes.INVALID_OLD_VERSION);
         }
+    }
+
+    function extractTokens() public view returns (address[] tokens) {
+        mapping(address => bool) uniqueTokens;
+        for ((, Command command) : _commands) {
+            CommandKind kind = command.kind;
+            if (kind == CommandKind.SWAP) {
+                address token = SwapAction.swapChildToken(command.params);
+                uniqueTokens[token] = true;
+            } else if (kind == CommandKind.DEPOSIT) {
+                address token = DepositAction.depositChildToken(command.params);
+                uniqueTokens[token] = true;
+            }
+        }
+        for ((, uint32 id) : _inputs) {
+            Command command = _getCommand(id);
+            address token = TokenInput.tokenInputToken(command.params);
+            uniqueTokens[token] = true;
+        }
+        return uniqueTokens.keys();
     }
 
     function changeOwner(address newOwner) public cashBack {
@@ -66,8 +90,13 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
 
     function withdraw(address token, uint128 amount, bool force) public onlyOwner {
         _reserve();
+        if (amount == 0) {
+            amount = _balances[token];
+        }
         _returnTokens(token, _owner, amount, force);
     }
+
+    function drain() public onlyOwner cashBack {}
 
     function claim() public onlyOwner {
         // todo
@@ -82,17 +111,8 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
         address /*remainingGasTo*/,
         TvmCell payload
     ) public override {
-        _reserve();
-        _balances[token] += amount;
-        // todo try-catch
-        (bool hasCallData, CallData callData) = _decodeCallData(payload);
-        if (hasCallData) {
-            _check(callData, sender);
-            ExecutionData executionData = ExecutionData(callData, token, amount, 0);
-            _execute(executionData);
-        } else {
-            _onInput(InputKind.TOKEN, token, sender, amount, msg.value);
-        }
+        require(msg.sender == _wallets[token] && msg.sender.value != 0, ErrorCodes.IS_NOT_WALLET);
+        _onTokenInput(token, amount, sender, payload);
     }
 
     function onAcceptTokensMint(
@@ -101,27 +121,34 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
         address /*remainingGasTo*/,
         TvmCell payload
     ) public override {
-        _reserve();
-        _balances[token] += amount;
-        (bool hasCallData, CallData callData) = _decodeCallData(payload);
-        if (hasCallData) {
-            _check(callData, address.makeAddrNone());
-            ExecutionData executionData = ExecutionData(callData, token, amount, 0);
-            _execute(executionData);
-        }
+        require(msg.sender == _wallets[token] && msg.sender.value != 0, ErrorCodes.IS_NOT_WALLET);
+        _onTokenInput(token, amount, address(0), payload);
     }
 
     receive() external {
         _reserve();
-        _onInput(InputKind.RECEIVE, address.makeAddrNone(), msg.sender, msg.value, 0);
+        _onInput(InputKind.RECEIVE, address(0), msg.sender, msg.value, 0);
     }
 
     function trigger(uint128 amount) public {
         _reserve();
         require(msg.value >= amount, ErrorCodes.INVALID_INPUT);
-        _onInput(InputKind.TRIGGER, address.makeAddrNone(), msg.sender, amount, msg.value - amount);
+        _onInput(InputKind.TRIGGER, address(0), msg.sender, amount, msg.value - amount);
     }
 
+
+    function _onTokenInput(address token, uint128 amount, address sender, TvmCell payload) private {
+        _reserve();
+        _balances[token] += amount;
+        (bool hasCallData, CallData callData) = _decodeCallData(payload);
+        if (hasCallData) {
+            _check(callData, token, sender);
+            _executionData = ExecutionData(callData, token, amount, 0);
+            _execute();
+        } else {
+            _onInput(InputKind.TOKEN, token, sender, amount, msg.value);
+        }
+    }
 
     function _decodeCallData(TvmCell payload) private pure returns (bool, CallData) {
         if (!payload.toSlice().hasNBitsAndRefs(267 + 32 + 32, 0)) {
@@ -147,62 +174,65 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
         uint32 id = _inputs[hash];
         Command command = _getCommand(id);
         TokenInputData tokenInputData = TokenInput.decodeTokenInputData(command.params);
-        TokenInput._checkTokenInput(tokenInputData, amount, gas);
+        TokenInput._checkTokenInput(tokenInputData, token, amount, gas);
         emit ExecuteInput(id);
         CallData callData = CallData(sender, 0, command.nextID);
-        ExecutionData executionData = ExecutionData(callData, token, amount, 0);
-        _execute(executionData);
+        _executionData = ExecutionData(callData, token, amount, 0);
+        _execute();
     }
 
-    function _check(CallData callData, address sender) private view {
+    function _check(CallData callData, address token, address sender) private view {
         Command command = _getCommand(callData.parentID);
         CommandKind kind = command.kind;
         if (kind == CommandKind.SWAP) {
             SwapAction._checkSwapResponse(sender);
         } else if (kind == CommandKind.DEPOSIT) {
-            // todo
-            DepositAction._checkDepositResponse(command.params);
+            DepositAction._checkDepositResponse(command.params, token);
         } else {
             revert(ErrorCodes.INVALID_COMMAND);
         }
     }
 
-    function _execute(ExecutionData executionData) private {
+    function _execute() private {
         do {
-            uint32 id = executionData.callData.childID;
+            uint32 id = _executionData.callData.childID;
             Command command = _getCommand(id);
-            _executeOne(command, executionData);
-            executionData.callData.childID = command.nextID;
+            _executeOne(command);
+            _executionData.callData.childID = command.nextID;
             emit ExecuteCommand(id);
-        } while (executionData.callData.childID != 0);
+        } while (_executionData.callData.childID != 0);
     }
 
-    function _executeOne(Command command, ExecutionData executionData) private {
+    function _executeOne(Command command) private {
         CommandKind kind = command.kind;
         if (kind == CommandKind.EXIT) {
             return;
         }
         if (kind == CommandKind.TRANSFER) {
-            TransferActionData data = TransferAction.decodeTransferActionData(command.params, executionData, _owner);
+            TransferActionData data = TransferAction.decodeTransferActionData(command.params, _executionData, _owner);
+            _executionData.spent += data.amount;
             _transfer(data);
         } else if (kind == CommandKind.SWAP) {
-            SwapActionData data = SwapAction.decodeSwapActionData(command.params, executionData);
-            TvmCell meta = _encodeNextCallData(command, executionData.callData);
+            SwapActionData data = SwapAction.decodeSwapActionData(command.params, _executionData);
+            _executionData.spent += data.amount;
+            TvmCell meta = _encodeNextCallData(command);
             _swap(data, meta);
         } else if (kind == CommandKind.DEPOSIT) {
-            DepositActionData data = DepositAction.decodeDepositActionData(command.params, executionData);
-            TvmCell meta = _encodeNextCallData(command, executionData.callData);
+            DepositActionData data = DepositAction.decodeDepositActionData(command.params, _executionData);
+            _executionData.spent += data.amount;
+            TvmCell meta = _encodeNextCallData(command);
             _deposit(data, meta);
         } else if (kind == CommandKind.FARM) {
-            FarmActionData data = FarmAction.decodeFarmActionData(command.params, executionData, _owner);
+            FarmActionData data = FarmAction.decodeFarmActionData(command.params, _executionData, _owner);
+            _executionData.spent += data.amount;
             _farm(data);
         }
     }
 
-    function _encodeNextCallData(Command command, CallData callData) private pure inline returns (TvmCell) {
+    function _encodeNextCallData(Command command) private view inline returns (TvmCell) {
         CallData nextCallData = CallData({
-            sender: callData.sender,
-            parentID: callData.childID,
+            sender: _executionData.callData.sender,
+            parentID: _executionData.callData.childID,
             childID: command.childID
         });
         return abi.encode(nextCallData);
@@ -215,7 +245,7 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
 
     function _returnTokens(address token, address sender, uint128 amount, bool force) private {
         emit ReturnTokens();
-        if (token.isNone()) {
+        if (token.value == 0) {
             sender.transfer({value: 0, flag: MsgFlag.ALL_NOT_RESERVED, bounce: false});
         } else {
             TvmCell empty;

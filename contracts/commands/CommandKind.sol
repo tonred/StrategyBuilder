@@ -6,7 +6,5 @@ enum CommandKind {
     TRANSFER,   // 1
     SWAP,       // 2
     DEPOSIT,    // 3
-    FARM,       // 4
-    WRAP,       // 5
-    UNWRAP      // 6
+    FARM        // 4
 }

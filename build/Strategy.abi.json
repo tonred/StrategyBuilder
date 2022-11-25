@@ -4,6 +4,14 @@
 	"header": ["pubkey", "time", "expire"],
 	"functions": [
 		{
+			"name": "extractTokens",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"tokens","type":"address[]"}
+			]
+		},
+		{
 			"name": "changeOwner",
 			"inputs": [
 				{"name":"newOwner","type":"address"}
@@ -17,6 +25,13 @@
 				{"name":"token","type":"address"},
 				{"name":"amount","type":"uint128"},
 				{"name":"force","type":"bool"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "drain",
+			"inputs": [
 			],
 			"outputs": [
 			]
@@ -74,6 +89,7 @@
 		{
 			"name": "encodeTokenInputData",
 			"inputs": [
+				{"name":"token","type":"address"},
 				{"name":"minAmount","type":"uint128"},
 				{"name":"minGas","type":"uint128"}
 			],
@@ -87,7 +103,16 @@
 				{"name":"params","type":"cell"}
 			],
 			"outputs": [
-				{"components":[{"name":"minAmount","type":"uint128"},{"name":"minGas","type":"uint128"}],"name":"data","type":"tuple"}
+				{"components":[{"name":"token","type":"address"},{"name":"minAmount","type":"uint128"},{"name":"minGas","type":"uint128"}],"name":"data","type":"tuple"}
+			]
+		},
+		{
+			"name": "tokenInputToken",
+			"inputs": [
+				{"name":"params","type":"cell"}
+			],
+			"outputs": [
+				{"name":"token","type":"address"}
 			]
 		},
 		{
@@ -118,8 +143,9 @@
 		{
 			"name": "encodeDepositActionData",
 			"inputs": [
+				{"name":"second","type":"address"},
 				{"components":[{"name":"kind","type":"uint8"},{"name":"value","type":"uint128"}],"name":"amount","type":"tuple"},
-				{"name":"pair","type":"address"},
+				{"name":"lp","type":"address"},
 				{"name":"value","type":"uint128"},
 				{"name":"flag","type":"uint8"}
 			],
@@ -134,14 +160,23 @@
 				{"components":[{"components":[{"name":"sender","type":"address"},{"name":"parentID","type":"uint32"},{"name":"childID","type":"uint32"}],"name":"callData","type":"tuple"},{"name":"token","type":"address"},{"name":"amount","type":"uint128"},{"name":"spent","type":"uint128"}],"name":"data","type":"tuple"}
 			],
 			"outputs": [
-				{"components":[{"name":"token","type":"address"},{"name":"amount","type":"uint128"},{"name":"pair","type":"address"},{"name":"remainingGasTo","type":"address"},{"name":"value","type":"uint128"},{"name":"flag","type":"uint8"}],"name":"decoded","type":"tuple"}
+				{"components":[{"name":"token","type":"address"},{"name":"second","type":"address"},{"name":"amount","type":"uint128"},{"name":"lp","type":"address"},{"name":"remainingGasTo","type":"address"},{"name":"value","type":"uint128"},{"name":"flag","type":"uint8"}],"name":"decoded","type":"tuple"}
+			]
+		},
+		{
+			"name": "depositChildToken",
+			"inputs": [
+				{"name":"params","type":"cell"}
+			],
+			"outputs": [
+				{"name":"token","type":"address"}
 			]
 		},
 		{
 			"name": "encodeSwapActionData",
 			"inputs": [
+				{"name":"to","type":"address"},
 				{"components":[{"name":"kind","type":"uint8"},{"name":"value","type":"uint128"}],"name":"amount","type":"tuple"},
-				{"name":"pair","type":"address"},
 				{"name":"value","type":"uint128"},
 				{"name":"flag","type":"uint8"}
 			],
@@ -156,7 +191,16 @@
 				{"components":[{"components":[{"name":"sender","type":"address"},{"name":"parentID","type":"uint32"},{"name":"childID","type":"uint32"}],"name":"callData","type":"tuple"},{"name":"token","type":"address"},{"name":"amount","type":"uint128"},{"name":"spent","type":"uint128"}],"name":"data","type":"tuple"}
 			],
 			"outputs": [
-				{"components":[{"name":"token","type":"address"},{"name":"amount","type":"uint128"},{"name":"pair","type":"address"},{"name":"remainingGasTo","type":"address"},{"name":"value","type":"uint128"},{"name":"flag","type":"uint8"}],"name":"decoded","type":"tuple"}
+				{"components":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"amount","type":"uint128"},{"name":"remainingGasTo","type":"address"},{"name":"value","type":"uint128"},{"name":"flag","type":"uint8"}],"name":"decoded","type":"tuple"}
+			]
+		},
+		{
+			"name": "swapChildToken",
+			"inputs": [
+				{"name":"params","type":"cell"}
+			],
+			"outputs": [
+				{"name":"token","type":"address"}
 			]
 		},
 		{
@@ -311,6 +355,7 @@
 		{"name":"_root","type":"address"},
 		{"name":"_owner","type":"address"},
 		{"components":[{"name":"kind","type":"uint8"},{"name":"params","type":"cell"},{"name":"childID","type":"uint32"},{"name":"nextID","type":"uint32"}],"name":"_commands","type":"map(uint32,tuple)"},
-		{"name":"_inputs","type":"map(uint256,uint32)"}
+		{"name":"_inputs","type":"map(uint256,uint32)"},
+		{"components":[{"components":[{"name":"sender","type":"address"},{"name":"parentID","type":"uint32"},{"name":"childID","type":"uint32"}],"name":"callData","type":"tuple"},{"name":"token","type":"address"},{"name":"amount","type":"uint128"},{"name":"spent","type":"uint128"}],"name":"_executionData","type":"tuple"}
 	]
 }

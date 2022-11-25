@@ -57,7 +57,6 @@ library ExtendedTypes {
             return extended.value;
         } else if (kind == AmountExtendedKind.PERCENT) {
             uint128 value = math.muldiv(data.amount, extended.value, Constants.PERCENT_DENOMINATOR);
-            data.spent += value;
             return value;
         } else if (kind == AmountExtendedKind.REMAINING) {
             return (data.amount > data.spent) ? (data.amount - data.spent) : 0;

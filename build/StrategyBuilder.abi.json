@@ -14,12 +14,21 @@
 			]
 		},
 		{
-			"name": "createStrategy",
+			"name": "expectedStrategyValue",
 			"inputs": [
 				{"name":"answerId","type":"uint32"},
+				{"name":"tokensCount","type":"uint32"}
+			],
+			"outputs": [
+				{"name":"value","type":"uint128"}
+			]
+		},
+		{
+			"name": "createStrategy",
+			"inputs": [
 				{"components":[{"name":"owner","type":"address"},{"components":[{"name":"kind","type":"uint8"},{"name":"params","type":"cell"},{"name":"childID","type":"uint32"},{"name":"nextID","type":"uint32"}],"name":"commands","type":"map(uint32,tuple)"},{"name":"inputs","type":"map(uint256,uint32)"}],"name":"data","type":"tuple"},
-				{"name":"tokens","type":"address[]"},
-				{"name":"nonce","type":"uint64"}
+				{"name":"nonce","type":"uint64"},
+				{"name":"callbackTo","type":"address"}
 			],
 			"outputs": [
 				{"name":"strategy","type":"address"}
@@ -96,7 +105,7 @@
 	],
 	"events": [
 		{
-			"name": "NewStrategy",
+			"name": "CreatedStrategy",
 			"inputs": [
 				{"name":"strategy","type":"address"},
 				{"name":"owner","type":"address"}

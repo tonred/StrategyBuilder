@@ -6,8 +6,9 @@
   "scripts": {
     "setup": "npm install",
     "build": "export $(cat .env | xargs) && locklift build --config locklift.config.js",
-    "test": "locklift test --test test/ --config locklift.config.js --network local --disable-build",
-    "deploy-bridge": "locklift run -s scripts/deploy-builder.js --config locklift.config.js --network local --disable-build"
+    "test": "locklift test --test test/ --config locklift.config.js --network main --disable-build",
+    "deploy-bridge": "locklift run -s scripts/deploy-builder.js --config locklift.config.js --network main --disable-build",
+    "deploy-test": "locklift run -s scripts/deploy-test.js --config locklift.config.js --network red --disable-build"
   },
   "author": "TONRED",
   "license": "ISC",

@@ -2,7 +2,7 @@
 Command         Action.Deposit
 Description     Deposit liquidity to pool
 Parents         1
-Childs          1  [onAcceptTokensMint]
+Childs          1 [onAcceptTokensMint]
 Target          https://github.com/broxus/flatqube-contracts/blob/master/contracts/DexPair.sol#L232
 
 */
@@ -14,6 +14,7 @@ pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 
 import "./Transfer.sol";
+import "../../utils/DexUtils.sol";
 
 import "tip3/contracts/interfaces/IAcceptTokensMintCallback.sol";
 import "flatqube/contracts/libraries/DexOperationTypes.sol";
@@ -21,8 +22,9 @@ import "flatqube/contracts/libraries/DexOperationTypes.sol";
 
 struct DepositActionData {
     address token;
+    address second;
     uint128 amount;
-    address pair;
+    address lp;
     address remainingGasTo;
     uint128 value;
     uint8 flag;
@@ -32,29 +34,40 @@ struct DepositActionData {
 abstract contract DepositAction is TransferAction, IAcceptTokensMintCallback {
 
     function encodeDepositActionData(
-        AmountExtended amount, address pair, uint128 value, uint8 flag
+        address second, AmountExtended amount, address lp, uint128 value, uint8 flag
     ) public pure returns (TvmCell encoded) {
-        return abi.encode(amount, pair, value, flag);
+        return abi.encode(second, amount, lp, value, flag);
     }
 
     function decodeDepositActionData(TvmCell params, ExecutionData data) public pure returns (DepositActionData decoded) {
-        (AmountExtended amount, address pair, uint128 value, uint8 flag)
-            = abi.decode(params, (AmountExtended, address, uint128, uint8));
+        (address second, AmountExtended amount, address lp, uint128 value, uint8 flag)
+            = abi.decode(params, (address, AmountExtended, address, uint128, uint8));
         uint128 amountDecoded = ExtendedTypes.decodeAmountExtended(amount, data);
-        return DepositActionData(data.token, amountDecoded, pair, data.callData.sender, value, flag);
+        return DepositActionData(data.token, second, amountDecoded, lp, data.callData.sender, value, flag);
     }
 
-    function _checkDepositResponse(TvmCell params) internal pure {
-        (/*amount*/, address pair, /*value*/, /*flag*/) = abi.decode(params, (AmountExtended, address, uint128, uint8));
-        require(msg.sender == pair, ErrorCodes.WRONG_ACTION_CALLBACK);
+    function depositChildToken(TvmCell params) public pure returns (address token) {
+        return _lp(params);
+    }
+
+    function _checkDepositResponse(TvmCell params, address sender) internal pure {
+        require(sender == _lp(params), ErrorCodes.WRONG_ACTION_CALLBACK);
+    }
+
+    function _lp(TvmCell params) private pure returns (address) {
+        // Based on alignment of DepositActionData:
+        // cell 1: second + amount + ref to cell 2
+        // cell 2: lp + value + flag
+        return params.toSlice().loadRefAsSlice().decode(address);
     }
 
     function _deposit(DepositActionData data, TvmCell meta) internal {
         TvmCell payload = _buildDepositPayload(meta);
+        address pair = DexUtils.pairAddress(data.token, data.second);
         _transfer(TransferActionData({
             token: data.token,
             amount: data.amount,
-            recipient: data.pair,
+            recipient: pair,
             isDeployWallet: false,
             remainingGasTo: data.remainingGasTo,
             payload: payload,
