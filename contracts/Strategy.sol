@@ -13,7 +13,7 @@ import "./commands/Command.sol";
 import "./utils/TransferUtils.sol";
 
 
-contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, TransferUtils {
+contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, TokenInput, TransferUtils {
 
     event ChangedOwner(address oldOwner, address newOwner);
     event ExecuteCommand(uint32 id);
@@ -32,20 +32,13 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Tran
             (address root, TvmCell initialData, TvmCell initialParams) =
                 abi.decode(input, (address, TvmCell, TvmCell));
             _root = root;
-            (_owner, _commands, _inputs) =
-                abi.decode(initialData, (address, mapping(uint32 => Command), mapping(uint256 => uint32)));
+            (_owner, _commands, _inputs, /*uint64 nonce*/) =
+                abi.decode(initialData, (address, mapping(uint32 => Command), mapping(uint256 => uint32), uint64));
             address[] tokens = abi.decode(initialParams, address[]);
             _createWallets(tokens);
         } else {
             // todo versions
             // revert(VersionableErrorCodes.INVALID_OLD_VERSION);
-        }
-    }
-
-    function _checkStrategy() private view {
-        require(!_commands.empty() && !_commands.exists(0), ErrorCodes.INVALID_INPUT);
-        for ((, uint32 id) : _inputs) {
-            require(_commands.exists(id), ErrorCodes.INVALID_INPUT);
         }
     }
 
@@ -71,8 +64,8 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Tran
         // todo try-catch
         (bool hasCallData, CallData callData) = _decodeCallData(payload);
         if (hasCallData) {
-            _check(callData);
-            ExecutionData executionData = ExecutionData(callData, amount, 0);
+            _check(callData, sender);
+            ExecutionData executionData = ExecutionData(callData, token, amount, 0);
             _execute(executionData);
         } else {
             _onInput(InputKind.TOKEN, token, sender, amount, msg.value);
@@ -89,8 +82,8 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Tran
         _balances[token] += amount;
         (bool hasCallData, CallData callData) = _decodeCallData(payload);
         if (hasCallData) {
-            _check(callData);
-            ExecutionData executionData = ExecutionData(callData, amount, 0);
+            _check(callData, address.makeAddrNone());
+            ExecutionData executionData = ExecutionData(callData, token, amount, 0);
             _execute(executionData);
         }
     }
@@ -133,16 +126,17 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Tran
         TokenInput._checkTokenInput(tokenInputData, sender, amount, gas);
         emit ExecuteInput(id);
         CallData callData = CallData(sender, 0, command.nextID);
-        ExecutionData executionData = ExecutionData(callData, amount, 0);
+        ExecutionData executionData = ExecutionData(callData, token, amount, 0);
         _execute(executionData);
     }
 
-    function _check(CallData callData) private view {
+    function _check(CallData callData, address sender) private view {
         Command command = _getCommand(callData.parentID);
         CommandKind kind = command.kind;
         if (kind == CommandKind.SWAP) {
-            SwapAction._checkSwapResponse(command.params);
+            SwapAction._checkSwapResponse(sender);
         } else if (kind == CommandKind.DEPOSIT) {
+            // todo
             DepositAction._checkDepositResponse(command.params);
         } else {
             revert(ErrorCodes.INVALID_COMMAND);

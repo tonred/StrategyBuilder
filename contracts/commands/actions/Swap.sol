@@ -32,21 +32,21 @@ struct SwapActionData {
 abstract contract SwapAction is TransferAction, IAcceptTokensTransferCallback {
 
     function encodeSwapActionData(
-        address token, AmountExtended amount, address pair, uint128 value, uint8 flag
+        AmountExtended amount, address pair, uint128 value, uint8 flag
     ) public pure returns (TvmCell encoded) {
-        return abi.encode(token, amount, pair, value, flag);
+        return abi.encode(amount, pair, value, flag);
     }
 
     function decodeSwapActionData(TvmCell params, ExecutionData data) public pure returns (SwapActionData decoded) {
-        (address token, AmountExtended amount, address pair, uint128 value, uint8 flag) =
-            abi.decode(params, (address, AmountExtended, address, uint128, uint8));
+        (AmountExtended amount, address pair, uint128 value, uint8 flag) =
+            abi.decode(params, (AmountExtended, address, uint128, uint8));
         uint128 amountDecoded = ExtendedTypes.decodeAmountExtended(amount, data);
-        return SwapActionData(token, amountDecoded, pair, data.callData.sender, value, flag);
+        return SwapActionData(data.token, amountDecoded, pair, data.callData.sender, value, flag);
     }
 
-    function _checkSwapResponse(TvmCell params) internal pure {
-        (/*token*/, /*amount*/, address pair) = abi.decode(params, (address, AmountExtended, address));
-        require(msg.sender == pair, ErrorCodes.WRONG_ACTION_CALLBACK);
+    function _checkSwapResponse(address sender) internal pure {
+        address dex_vault = address.makeAddrStd(0, Constants.DEX_VAULT_VALUE);
+        require(sender == dex_vault, ErrorCodes.WRONG_ACTION_CALLBACK);
     }
 
     function _swap(SwapActionData data, TvmCell meta) internal {
@@ -65,14 +65,12 @@ abstract contract SwapAction is TransferAction, IAcceptTokensTransferCallback {
     }
 
     function _buildSwapPayload(TvmCell meta) private pure returns (TvmCell) {
-        TvmBuilder successBuilder;
-        successBuilder.store(meta);
         TvmBuilder builder;
         builder.store(DexOperationTypes.EXCHANGE);  // operation type
         builder.store(uint64(0));                   // id
         builder.store(uint128(0));                  // deploy wallet grams
         builder.store(uint128(0));                  // expected amount (minimum)
-        builder.storeRef(successBuilder);           // [ref] on success payload
+        builder.storeRef(meta);                     // [ref] on success payload
         return builder.toCell();
     }
 

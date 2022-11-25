@@ -36,18 +36,18 @@ struct TransferActionData {
 abstract contract TransferAction is WalletManager {
 
     function encodeTransferActionData(
-        address token, AmountExtended amount, AddressExtended recipient, bool isDeployWallet, TvmCell payload, uint128 value, uint8 flag
+        AmountExtended amount, AddressExtended recipient, bool isDeployWallet, TvmCell payload, uint128 value, uint8 flag
     ) public pure returns (TvmCell encoded) {
-        return abi.encode(token, amount, recipient, isDeployWallet, payload, value, flag);
+        return abi.encode(amount, recipient, isDeployWallet, payload, value, flag);
     }
 
     function decodeTransferActionData(TvmCell params, ExecutionData data) public pure returns (TransferActionData decoded) {
-        (address token, AmountExtended amount, AddressExtended recipient, bool isDeployWallet, TvmCell payload, uint128 value, uint8 flag) =
-            abi.decode(params, (address, AmountExtended, AddressExtended, bool, TvmCell, uint128, uint8));
+        (AmountExtended amount, AddressExtended recipient, bool isDeployWallet, TvmCell payload, uint128 value, uint8 flag) =
+            abi.decode(params, (AmountExtended, AddressExtended, bool, TvmCell, uint128, uint8));
         address sender = data.callData.sender;
         uint128 amountDecoded = ExtendedTypes.decodeAmountExtended(amount, data);
         address recipientDecoded = ExtendedTypes.decodeAddressExtended(recipient, sender);
-        return TransferActionData(token, amountDecoded, recipientDecoded, isDeployWallet, sender, payload, value, flag, false);
+        return TransferActionData(data.token, amountDecoded, recipientDecoded, isDeployWallet, sender, payload, value, flag, false);
     }
 
     function _transfer(TransferActionData data) internal {

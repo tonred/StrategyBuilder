@@ -20,7 +20,7 @@ const main = async () => {
     },
     initParams: {
       // _randomNonce: locklift.utils.getRandomNonce(),
-      _randomNonce: 69,
+      _randomNonce: 690000,
     },
     keyPair
   }, locklift.utils.convertCrystal(3, 'nano'));

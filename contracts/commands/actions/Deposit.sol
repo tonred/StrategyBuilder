@@ -32,20 +32,20 @@ struct DepositActionData {
 abstract contract DepositAction is TransferAction, IAcceptTokensMintCallback {
 
     function encodeDepositActionData(
-        address token, AmountExtended amount, address pair, uint128 value, uint8 flag
+        AmountExtended amount, address pair, uint128 value, uint8 flag
     ) public pure returns (TvmCell encoded) {
-        return abi.encode(token, amount, pair, value, flag);
+        return abi.encode(amount, pair, value, flag);
     }
 
     function decodeDepositActionData(TvmCell params, ExecutionData data) public pure returns (DepositActionData decoded) {
-        (address token, AmountExtended amount, address pair, uint128 value, uint8 flag)
-            = abi.decode(params, (address, AmountExtended, address, uint128, uint8));
+        (AmountExtended amount, address pair, uint128 value, uint8 flag)
+            = abi.decode(params, (AmountExtended, address, uint128, uint8));
         uint128 amountDecoded = ExtendedTypes.decodeAmountExtended(amount, data);
-        return DepositActionData(token, amountDecoded, pair, data.callData.sender, value, flag);
+        return DepositActionData(data.token, amountDecoded, pair, data.callData.sender, value, flag);
     }
 
     function _checkDepositResponse(TvmCell params) internal pure {
-        (/*token*/, /*amount*/, address pair) = abi.decode(params, (address, AmountExtended, address));
+        (/*amount*/, address pair, /*value*/, /*flag*/) = abi.decode(params, (AmountExtended, address, uint128, uint8));
         require(msg.sender == pair, ErrorCodes.WRONG_ACTION_CALLBACK);
     }
 
@@ -65,13 +65,11 @@ abstract contract DepositAction is TransferAction, IAcceptTokensMintCallback {
     }
 
     function _buildDepositPayload(TvmCell meta) private pure returns (TvmCell) {
-        TvmBuilder successBuilder;
-        successBuilder.store(meta);
         TvmBuilder builder;
         builder.store(DexOperationTypes.DEPOSIT_LIQUIDITY); // operation type
         builder.store(uint64(0));                           // id
         builder.store(uint128(0));                          // deploy wallet grams
-        builder.storeRef(successBuilder);                   // [ref] on success payload
+        builder.storeRef(meta);                             // [ref] on success payload
         return builder.toCell();
     }
 

@@ -31,17 +31,17 @@ struct FarmActionData {
 abstract contract FarmAction is TransferAction {
 
     function encodeFarmActionData(
-        address token, AmountExtended amount, address farm, AddressExtended depositOwner, uint32 lockTime, uint128 value, uint8 flag
+        AmountExtended amount, address farm, AddressExtended depositOwner, uint32 lockTime, uint128 value, uint8 flag
     ) public pure returns (TvmCell encoded) {
-        return abi.encode(token, amount, farm, depositOwner, lockTime, value, flag);
+        return abi.encode(amount, farm, depositOwner, lockTime, value, flag);
     }
 
     function decodeFarmActionData(TvmCell params, ExecutionData data) public pure returns (FarmActionData decoded) {
-        (address token, AmountExtended amount, address farm, AddressExtended depositOwner, uint32 lockTime, uint128 value, uint8 flag) =
-            abi.decode(params, (address, AmountExtended, address, AddressExtended, uint32, uint128, uint8));
+        (AmountExtended amount, address farm, AddressExtended depositOwner, uint32 lockTime, uint128 value, uint8 flag) =
+            abi.decode(params, (AmountExtended, address, AddressExtended, uint32, uint128, uint8));
         uint128 amountDecoded = ExtendedTypes.decodeAmountExtended(amount, data);
         address depositOwnerDecoded = ExtendedTypes.decodeAddressExtended(depositOwner, data.callData.sender);
-        return FarmActionData(token, amountDecoded, farm, data.callData.sender, depositOwnerDecoded, lockTime, value, flag);
+        return FarmActionData(data.token, amountDecoded, farm, data.callData.sender, depositOwnerDecoded, lockTime, value, flag);
     }
 
     function _farm(FarmActionData data) internal {

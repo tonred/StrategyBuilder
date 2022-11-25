@@ -18,10 +18,26 @@
 			"inputs": [
 				{"name":"answerId","type":"uint32"},
 				{"components":[{"name":"owner","type":"address"},{"components":[{"name":"kind","type":"uint8"},{"name":"params","type":"cell"},{"name":"childID","type":"uint32"},{"name":"nextID","type":"uint32"}],"name":"commands","type":"map(uint32,tuple)"},{"name":"inputs","type":"map(uint256,uint32)"}],"name":"data","type":"tuple"},
-				{"name":"tokens","type":"address[]"}
+				{"name":"tokens","type":"address[]"},
+				{"name":"nonce","type":"uint64"}
 			],
 			"outputs": [
 				{"name":"strategy","type":"address"}
+			]
+		},
+		{
+			"name": "checkStrategy",
+			"inputs": [
+				{"components":[{"name":"owner","type":"address"},{"components":[{"name":"kind","type":"uint8"},{"name":"params","type":"cell"},{"name":"childID","type":"uint32"},{"name":"nextID","type":"uint32"}],"name":"commands","type":"map(uint32,tuple)"},{"name":"inputs","type":"map(uint256,uint32)"}],"name":"data","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "drain",
+			"inputs": [
+			],
+			"outputs": [
 			]
 		},
 		{
@@ -31,6 +47,15 @@
 			],
 			"outputs": [
 				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "hashCommand",
+			"inputs": [
+				{"components":[{"name":"kind","type":"uint8"},{"name":"params","type":"cell"},{"name":"childID","type":"uint32"},{"name":"nextID","type":"uint32"}],"name":"command","type":"tuple"}
+			],
+			"outputs": [
+				{"name":"value0","type":"uint32"}
 			]
 		},
 		{

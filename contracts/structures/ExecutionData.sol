@@ -5,6 +5,7 @@ import "./CallData.sol";
 
 struct ExecutionData {
     CallData callData;
-    uint128 total;
+    address token;
+    uint128 amount;
     uint128 spent;
 }

@@ -42,11 +42,11 @@ library ExtendedTypes {
         if (extended.kind == AmountExtendedKind.VALUE) {
             return extended.value;
         } else if (extended.kind == AmountExtendedKind.PERCENT) {
-            uint128 value = math.muldiv(data.total, extended.value, Constants.PERCENT_DENOMINATOR);
+            uint128 value = math.muldiv(data.amount, extended.value, Constants.PERCENT_DENOMINATOR);
             data.spent += value;
             return value;
         } else if (extended.kind == AmountExtendedKind.REMAINING) {
-            return (data.total > data.spent) ? (data.total - data.spent) : 0;
+            return (data.amount > data.spent) ? (data.amount - data.spent) : 0;
         } else {
             revert(ErrorCodes.INVALID_EXTENDED_TYPE);
         }
