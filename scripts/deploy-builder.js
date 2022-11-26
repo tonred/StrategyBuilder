@@ -20,10 +20,10 @@ const main = async () => {
     },
     initParams: {
       // _randomNonce: locklift.utils.getRandomNonce(),
-      _randomNonce: 6900,
+      _randomNonce: 69,
     },
     keyPair
-  }, locklift.utils.convertCrystal(3, 'nano'));
+  }, locklift.utils.convertCrystal(1.1, 'nano'));
   console.log(builder.address);
   await logContract(builder);
 };

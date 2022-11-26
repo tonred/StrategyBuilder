@@ -37,28 +37,23 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
     }
 
 
-    function onCodeUpgrade(TvmCell input, bool upgrade) internal {
-        if (!upgrade) {
-            _reserve();
-            tvm.resetStorage();
-            (address root, TvmCell initialData, TvmCell initialParams) =
-                abi.decode(input, (address, TvmCell, TvmCell));
-            _root = root;
-            uint64 nonce;
-            (_owner, _commands, _inputs, nonce) =
-                abi.decode(initialData, (address, mapping(uint32 => Command), mapping(uint256 => uint32), uint64));
-            (address[] additionalTokens, address callbackTo) = abi.decode(initialParams, (address[], address));
-            address[] tokens = extractTokens(additionalTokens);
-            _createWallets(tokens);
-            IOwner(callbackTo).onStrategyCreated{
-                value: 0,
-                flag: MsgFlag.ALL_NOT_RESERVED,
-                bounce: false
-            }(address(this), nonce);
-        } else {
-            // todo versions
-            // revert(VersionableErrorCodes.INVALID_OLD_VERSION);
-        }
+    function onCodeUpgrade(TvmCell input) internal {
+        _reserve();
+        tvm.resetStorage();
+        (address root, TvmCell initialData, TvmCell initialParams) =
+            abi.decode(input, (address, TvmCell, TvmCell));
+        _root = root;
+        uint64 nonce;
+        (_owner, _commands, _inputs, nonce) =
+            abi.decode(initialData, (address, mapping(uint32 => Command), mapping(uint256 => uint32), uint64));
+        (address[] additionalTokens, address callbackTo) = abi.decode(initialParams, (address[], address));
+        address[] tokens = extractTokens(additionalTokens);
+        _createWallets(tokens);
+        IOwner(callbackTo).onStrategyCreated{
+            value: 0,
+            flag: MsgFlag.ALL_NOT_RESERVED,
+            bounce: false
+        }(address(this), nonce);
     }
 
     function extractTokens(address[] additionalTokens) public view returns (address[] tokens) {
@@ -217,7 +212,7 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
 
     function _executeOne(Command command) private {
         CommandKind kind = command.kind;
-        if (kind == CommandKind.EXIT) {
+        if (kind == CommandKind.NOTHING) {
             return;
         }
         if (kind == CommandKind.TRANSFER) {

@@ -15,8 +15,8 @@ EVERCLOUD_KEY = os.getenv('EVERCLOUD_KEY', '480fe4ee5f3e45ac85e6aa70505dc8dc')
 BUILDER_ABI_FILENAME = '../../build/StrategyBuilder.abi.json'
 STRATEGY_ABI_FILENAME = '../../build/Strategy.abi.json'
 
-BUILDER_ADDRESS = '0:c1c968c0f68897a51aa1fa5e94b4f8e8b8e4ef79e197e9fc4c3337f888847ce5'
-STRATEGY_ADDRESS = '0:f9172819ab563a1666a1cd516539cf3747d2edc2eafa7cf2b74ee2a3904f0f68'  # just for utils methods
+BUILDER_ADDRESS = '0:bfa6edc24504f7e40904c8e8d9a942bd385b256a78f0f45000ca7b61016014bf'
+STRATEGY_ADDRESS = '0:2ddef82f0bd07ea5013c35f3fde096e3580cba2d9c157d1d241e5725345e654b'  # just for utils methods
 
 
 class Helper:

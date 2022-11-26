@@ -16,7 +16,7 @@ async def main():
     farm = '0:eab26e9b6834dfbd2eff9411c7f62c217fd9c8219ee062196b4a854a702acbdb'
     lock_time = 60 * 60 * 24 * 30  # 30 days
     helper = await Helper.create()
-    input_data = await helper.encode_token_input_data(wever, min_amount=to_ever(0.1), min_gas=to_ever(2.2))
+    input_data = await helper.encode_token_input_data(wever, min_amount=to_ever(0.1), min_gas=to_ever(8.9))
     fee_data = await helper.encode_transfer_data(
         amount=AmountExtended(AmountExtendedKind.PERCENT, helper.to_percent(0.05)),  # 5% fee
         recipient=AddressExtended(AddressExtendedKind.OWNER, ZERO_ADDRESS),
