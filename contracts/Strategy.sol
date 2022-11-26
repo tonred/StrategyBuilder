@@ -11,6 +11,7 @@ import "./commands/actions/Transfer.sol";
 import "./commands/inputs/TokenInput.sol";
 import "./commands/Command.sol";
 import "./interfaces/IOwner.sol";
+import "./interfaces/external/FlatqubeDao.sol";
 import "./utils/TransferUtils.sol";
 
 
@@ -46,9 +47,9 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
             uint64 nonce;
             (_owner, _commands, _inputs, nonce) =
                 abi.decode(initialData, (address, mapping(uint32 => Command), mapping(uint256 => uint32), uint64));
-            address[] tokens = extractTokens();
+            (address[] additionalTokens, address callbackTo) = abi.decode(initialParams, (address[], address));
+            address[] tokens = extractTokens(additionalTokens);
             _createWallets(tokens);
-            address callbackTo = abi.decode(initialParams, address);
             IOwner(callbackTo).onStrategyCreated{
                 value: 0,
                 flag: MsgFlag.ALL_NOT_RESERVED,
@@ -60,8 +61,11 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
         }
     }
 
-    function extractTokens() public view returns (address[] tokens) {
+    function extractTokens(address[] additionalTokens) public view returns (address[] tokens) {
         mapping(address => bool) uniqueTokens;
+        for (address token : additionalTokens) {
+            uniqueTokens[token] = true;
+        }
         for ((, Command command) : _commands) {
             CommandKind kind = command.kind;
             if (kind == CommandKind.SWAP) {
@@ -98,8 +102,12 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
 
     function drain() public onlyOwner cashBack {}
 
-    function claim() public onlyOwner {
-        // todo
+    function claim(address gauge, uint32 callID, uint32 nonce) public view onlyOwner minValue(Gas.MIN_CLAIM_VALUE) {
+        IGaugeBase(gauge).claimReward{
+            value: 0,
+            flag: MsgFlag.REMAINING_GAS,
+            bounce: false
+        }(Callback.CallMeta(callID, nonce, msg.sender));
     }
 
 
@@ -132,7 +140,10 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
 
     function trigger(uint128 amount) public {
         _reserve();
-        require(msg.value >= amount, ErrorCodes.INVALID_INPUT);
+        if (msg.value < amount) {
+            _returnTokens(address(0), msg.sender, 0, false);
+            return;
+        }
         _onInput(InputKind.TRIGGER, address(0), msg.sender, amount, msg.value - amount);
     }
 
@@ -165,8 +176,6 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
             AddressExtended anySender = ExtendedTypes.createAddressExtended(AddressExtendedKind.SENDER, address(0));
             hash = TokenInput.hashTokenInput(kind, token, anySender);
             if (!_inputs.exists(hash)) {
-                // todo try-catch ?
-//                revert(ErrorCodes.INVALID_INPUT);
                 _returnTokens(token, sender, amount, false);
                 return;
             }
@@ -174,7 +183,10 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
         uint32 id = _inputs[hash];
         Command command = _getCommand(id);
         TokenInputData tokenInputData = TokenInput.decodeTokenInputData(command.params);
-        TokenInput._checkTokenInput(tokenInputData, token, amount, gas);
+        if (!TokenInput._checkTokenInput(tokenInputData, token, amount, gas)) {
+            _returnTokens(token, sender, amount, false);
+            return;
+        }
         emit ExecuteInput(id);
         CallData callData = CallData(sender, 0, command.nextID);
         _executionData = ExecutionData(callData, token, amount, 0);

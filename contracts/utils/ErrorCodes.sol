@@ -3,16 +3,27 @@ pragma ever-solidity ^0.63.0;
 
 library ErrorCodes {
 
-    uint16 constant IS_NOT_OWNER = 6910;
-    uint16 constant IS_NOT_ROOT = 6911;
-    uint16 constant IS_NOT_TOKEN = 6912;
-    uint16 constant IS_NOT_WALLET = 6913;
-    uint16 constant NO_TOKEN_WALLET = 6914;
-    uint16 constant WRONG_AMOUNT = 6915;
-    uint16 constant WRONG_ACTION_CALLBACK = 6916;
-    uint16 constant WRONG_COMMAND = 6917;
-    uint16 constant INVALID_COMMAND = 6918;
-    uint16 constant INVALID_EXTENDED_TYPE = 6919;
-    uint16 constant INVALID_INPUT = 6920;
+    // Common
+    uint16 constant IS_NOT_OWNER            = 1001;
+    uint16 constant IS_NOT_WALLET           = 1002;
+
+    // Platform
+    uint16 constant IS_NOT_ROOT             = 2001;
+
+    // Wallet Manager
+    uint16 constant IS_NOT_TOKEN            = 3001;
+    uint16 constant NO_TOKEN_WALLET         = 3002;
+
+    uint16 constant INVALID_EXTENDED_TYPE   = 4001;
+
+    // Actions
+    uint16 constant WRONG_AMOUNT            = 5001;
+    uint16 constant WRONG_ACTION_CALLBACK   = 5002;
+
+    // Strategy
+    uint16 constant INVALID_COMMAND         = 6001;
+
+    // Strategy Builder
+    uint16 constant INVALID_INPUT           = 7001;
 
 }

@@ -6,6 +6,7 @@
 		{
 			"name": "extractTokens",
 			"inputs": [
+				{"name":"additionalTokens","type":"address[]"}
 			],
 			"outputs": [
 				{"name":"tokens","type":"address[]"}
@@ -39,6 +40,9 @@
 		{
 			"name": "claim",
 			"inputs": [
+				{"name":"gauge","type":"address"},
+				{"name":"callID","type":"uint32"},
+				{"name":"nonce","type":"uint32"}
 			],
 			"outputs": [
 			]
@@ -226,6 +230,16 @@
 			],
 			"outputs": [
 				{"components":[{"name":"token","type":"address"},{"name":"amount","type":"uint128"},{"name":"recipient","type":"address"},{"name":"isDeployWallet","type":"bool"},{"name":"remainingGasTo","type":"address"},{"name":"payload","type":"cell"},{"name":"value","type":"uint128"},{"name":"flag","type":"uint8"},{"name":"force","type":"bool"}],"name":"decoded","type":"tuple"}
+			]
+		},
+		{
+			"name": "onBounceTokensTransfer",
+			"inputs": [
+				{"name":"token","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"value2","type":"address"}
+			],
+			"outputs": [
 			]
 		},
 		{

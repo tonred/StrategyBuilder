@@ -5,6 +5,7 @@ pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 
 import "./commands/Command.sol";
+import "./interfaces/IUpgradable.sol";
 import "./platform/Platform.sol";
 import "./platform/PlatformType.sol";
 import "./utils/Gas.sol";
@@ -20,7 +21,7 @@ struct StrategyData {
 }
 
 
-contract StrategyBuilder is TransferUtils, RandomNonce {
+contract StrategyBuilder is IUpgradable, TransferUtils, RandomNonce {
 
     event CreatedStrategy(address strategy, address owner);
 
@@ -48,13 +49,12 @@ contract StrategyBuilder is TransferUtils, RandomNonce {
         return {value: 0, flag: MsgFlag.REMAINING_GAS, bounce: false} value;
     }
 
-    // todo tokens must be checked, but how... (no checks = broken strategy with same address)
     function createStrategy(
-        StrategyData data, uint64 nonce, address callbackTo
+        StrategyData data, uint64 nonce, address[] additionalTokens, address callbackTo
     ) public view minValue(Gas.STRATEGY_VALUE) returns (address strategy) {
         _reserve();
         checkStrategy(data);
-        TvmCell initialParams = abi.encode(callbackTo);
+        TvmCell initialParams = abi.encode(additionalTokens, callbackTo);
         TvmCell initialData = _buildStrategyInitialData(data, nonce);
         TvmCell stateInit = _buildPlatformStateInit(PlatformType.STRATEGY, initialData);
         strategy = new Platform{
@@ -74,11 +74,7 @@ contract StrategyBuilder is TransferUtils, RandomNonce {
         }
     }
 
-//    function drain() public onlyOwner cashBack {}
-    // todo only for dev
-    function drain() public view onlyOwner {
-        msg.sender.transfer({value: 0, flag: MsgFlag.ALL_NOT_RESERVED, bounce: false});
-    }
+    function drain() public onlyOwner cashBack {}
 
 
     function _buildStrategyInitialData(StrategyData data, uint64 nonce) private pure returns (TvmCell) {
@@ -111,15 +107,28 @@ contract StrategyBuilder is TransferUtils, RandomNonce {
     }
 
     function _targetBalance() internal view inline override returns (uint128) {
-        return Gas.STRATEGY_BUILDER_TARGET_BALANCE;
+        return Gas.BUILDER_TARGET_BALANCE;
     }
-
 
     onBounce(TvmSlice body) external pure {
         uint32 functionId = body.decode(uint32);
         if (functionId == tvm.functionId(Platform)) {
             // strategy already exist
         }
+    }
+
+
+    function upgrade(TvmCell code) public internalMsg override onlyOwner {
+        emit CodeUpgraded();
+        TvmCell data = abi.encode(_randomNonce, _owner, _platformCode, _strategyCode);
+        tvm.setcode(code);
+        tvm.setCurrentCode(code);
+        onCodeUpgrade(data);
+    }
+
+    function onCodeUpgrade(TvmCell input) private {
+        tvm.resetStorage();
+        (_randomNonce, _owner, _platformCode, _strategyCode) = abi.decode(input, (uint256, address, TvmCell, TvmCell));
     }
 
 }

@@ -6,7 +6,7 @@ import "./ErrorCodes.sol";
 
 
 enum AddressExtendedKind {
-    VALUE, SENDER, OWNER
+    VALUE, SENDER, OWNER, STRATEGY
 }
 
 struct AddressExtended {
@@ -46,6 +46,8 @@ library ExtendedTypes {
             return sender;
         } else if (kind == AddressExtendedKind.OWNER) {
             return owner;
+        } else if (kind == AddressExtendedKind.STRATEGY) {
+            return address(this);
         } else {
             revert(ErrorCodes.INVALID_EXTENDED_TYPE);
         }

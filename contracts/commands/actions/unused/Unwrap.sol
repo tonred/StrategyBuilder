@@ -26,6 +26,7 @@ struct UnwrapActionData {
 
 abstract contract UnwrapAction is TransferAction {
 
+    // todo sender checks
     function _unwrap(UnwrapActionData data, TvmCell meta) internal {
         address root = address.makeAddrStd(0, Constants.WEVER_ROOT_VALUE);
         address vault = address.makeAddrStd(0, Constants.WEVER_VAULT_VALUE);

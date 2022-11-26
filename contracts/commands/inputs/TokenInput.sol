@@ -35,8 +35,8 @@ abstract contract TokenInput {
         return params.toSlice().decode(address);
     }
 
-    function _checkTokenInput(TokenInputData data, address token, uint128 amount, uint128 gas) internal pure {
-        require(token == data.token && amount >= data.minAmount && gas >= data.minGas, ErrorCodes.INVALID_INPUT);
+    function _checkTokenInput(TokenInputData data, address token, uint128 amount, uint128 gas) internal pure returns (bool) {
+        return token == data.token && amount >= data.minAmount && gas >= data.minGas;
     }
 
 }

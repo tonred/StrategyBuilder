@@ -13,23 +13,12 @@ pragma AbiHeader time;
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 
-// todo maybe import only WalletManager...
+import "../../../interfaces/external/WrappedEver.sol";
 import "../../../utils/Constants.sol";
 import "../../../utils/ErrorCodes.sol";
 import "../../../utils/Gas.sol";
 
 import "@broxus/contracts/contracts/libraries/MsgFlag.sol";
-
-
-// todo as interface in dependency
-interface IVault {
-    function wrap(
-        uint128 tokens,
-        address owner_address,
-        address gas_back_address,
-        TvmCell payload
-    ) external;
-}
 
 
 struct WrapActionData {
@@ -51,7 +40,7 @@ abstract contract WrapAction {
             bounce: false
         }({
             tokens: data.amount,
-            owner_address: address(this),  // todo
+            owner_address: address(this),  // todo sender checks
             gas_back_address: data.remainingGasTo,
             payload: meta
         });

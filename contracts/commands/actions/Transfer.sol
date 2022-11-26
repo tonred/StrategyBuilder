@@ -18,6 +18,7 @@ import "../../abstract/WalletManager.sol";
 import "../../utils/ExtendedTypes.sol";
 
 import "tip3/contracts/interfaces/ITokenWallet.sol";
+import "tip3/contracts/interfaces/IBounceTokensTransferCallback.sol";
 
 
 struct TransferActionData {
@@ -33,7 +34,7 @@ struct TransferActionData {
 }
 
 
-abstract contract TransferAction is WalletManager {
+abstract contract TransferAction is WalletManager, IBounceTokensTransferCallback {
 
     function encodeTransferActionData(
         AmountExtended amount, AddressExtended recipient, bool isDeployWallet, TvmCell payload, uint128 value, uint8 flag
@@ -73,6 +74,15 @@ abstract contract TransferAction is WalletManager {
             notify: true,
             payload: data.payload
         });
+    }
+
+    function onBounceTokensTransfer(
+        address token,
+        uint128 amount,
+        address /*revertedFrom*/
+    ) public override {
+        require(_wallets.exists(msg.sender), ErrorCodes.IS_NOT_WALLET);
+        _balances[token] += amount;
     }
 
 }
