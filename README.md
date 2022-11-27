@@ -20,7 +20,7 @@ TG: @Abionics, @get_username
 
 ### Abstract
 
-Project contains 2 contract types: Strategy and StrategyBuilder.
+Project contains two contract types: Strategy and StrategyBuilder.
 StrategyBuilder is used for Strategy creation and validation.
 Strategy is the main entity which contains all info about workflow,
 token inputs, wallets etc
@@ -66,7 +66,7 @@ Examples of commands that we did not implemented due to lack of time:
 In order to detect different token inputs, every input has unique hash. This hash contains from
 token input kind, token root address and allowed sender address (use `AddressExtendedKind.SENDER` kind for any sender).
 Currently supported token input kinds:
-* `InputKind.TOKEN` - on TIP3.1 token input
+* `InputKind.TOKEN` - on TIP3.2 token input
 * `InputKind.RECEIVE` - on evers receiving
 * `InputKind.TRIGGER` - on calling `Strategy.trigger()` method via internal message
 
@@ -76,7 +76,7 @@ The most useful token input kinds is a `InputKind.TOKEN`
 
 Each Strategy has set of methods that can be called only by owner. It is:
 * `drain` - drain redundant evers
-* `withdraw(token, amount, force)` - withdraw TIP3.1 token from Strategy wallet.
+* `withdraw(token, amount, force)` - withdraw TIP3.2 token from Strategy wallet.
 Force used in order to skip balance checks in contract (in case of unexpected balance)
 * `claim(gauge, callID, nonce)` - claim reward from Strategy account in Gauge farming
 * `changeOwner(newOwner` - change owner of Strategy
@@ -93,21 +93,18 @@ Force used in order to skip balance checks in contract (in case of unexpected ba
 
 ### Deploy
 
-1) Setup
-
 ```shell
+# 1) Setup
 npm run setup
 ```
 
-2) Build
-
 ```shell
+# 2) Build
 npm run build
 ```
 
-3) Deploy
-
 ```shell
+# 3) Deploy
 npm run deploy-builder
 ```
 
@@ -117,6 +114,8 @@ npm run deploy-builder
 There is UI for viewing and building strategies.
 You can insert any created strategy in [https://strategy-builder-front.pages.dev](https://strategy-builder-front.pages.dev)
 and view it DAG. Moreover, you can execute any strategy directly from UI
+
+[//]: # (todo builder image)
 
 Besides, there is simple Python tool for strategy building in [tools/strategy](tools/strategy).
 Dot forget to install [requirements.txt](tools/requirements.txt) before.
@@ -130,22 +129,20 @@ It already contains 5 sample strategy, that is describes in [Sample Strategies](
 MainNet address: `0:2ddef82f0bd07ea5013c35f3fde096e3580cba2d9c157d1d241e5725345e654b`
 
 UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:2ddef82f0bd07ea5013c35f3fde096e3580cba2d9c157d1d241e5725345e654b](https://strategy-builder-front.pages.dev/strategy/0:2ddef82f0bd07ea5013c35f3fde096e3580cba2d9c157d1d241e5725345e654b)
-
 ![Sample Strategy 1](docs/sample-strategy-1.png)
 
 This is a simple Strategy that swap any amount WEVER to USDT and send them back to sender.
-It is a pipeline "receive token + swap a preconfigured portion of them + optionally send to preconfigured recipient address" from challenge
+It is a pipeline _"receive token + swap a preconfigured portion of them + optionally send to preconfigured recipient address"_ from challenge
 
 ### Swap to 3 stables
 
 MainNet address: `0:35b5f401b1923644c93f5fbad2ee902f090febe794cd8cf1067f2794f9bcf362`
 
 UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:35b5f401b1923644c93f5fbad2ee902f090febe794cd8cf1067f2794f9bcf362](https://strategy-builder-front.pages.dev/strategy/0:35b5f401b1923644c93f5fbad2ee902f090febe794cd8cf1067f2794f9bcf362)
-
 ![Sample Strategy 2](docs/sample-strategy-2.png)
 
 This Strategy swap any amount WEVER to USDT + USDC + DAI in equal proportion (33.3%).
-It is a pipeline "receive token + swap to multiple tokens according to configuration + withdraw method" from challenge.
+It is a pipeline _"receive token + swap to multiple tokens according to configuration + withdraw method"_ from challenge.
 By the way, withdraw method is also implemented, see [Additional Functions](#Additional-Functions)
 
 ### Deposit and farm
@@ -153,19 +150,17 @@ By the way, withdraw method is also implemented, see [Additional Functions](#Add
 MainNet address: `0:11c828b1c4ff5dd05e352ec1596c8b4c04ebdcfeb9aefa25043f9a1bbf2a7022`
 
 UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:11c828b1c4ff5dd05e352ec1596c8b4c04ebdcfeb9aefa25043f9a1bbf2a7022](https://strategy-builder-front.pages.dev/strategy/0:11c828b1c4ff5dd05e352ec1596c8b4c04ebdcfeb9aefa25043f9a1bbf2a7022)
-
 ![Sample Strategy 3](docs/sample-strategy-3.png)
 
 This Strategy add user WEVER to WEVER-USDT pool and lock lp in farm. **Owner of locked lp and reward is sender.**
 Besides, this Strategy take 5% fee that sends to Strategy owner balance. 
-It is a pipeline "receive token + swap in 50/50 proportion + provide liquidity to pool + receive LP + lock LP into farming pool + claim rewards method with optional recipient address" from challenge.
+It is a pipeline _"receive token + swap in 50/50 proportion + provide liquidity to pool + receive LP + lock LP into farming pool + claim rewards method with optional recipient address"_ from challenge.
 
 ### Any to WEVER
 
 MainNet address: `0:7e4d84423acf3121b42113d669fc87be010ff3926d0ba007874663e53a912197`
 
 UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:7e4d84423acf3121b42113d669fc87be010ff3926d0ba007874663e53a912197](https://strategy-builder-front.pages.dev/strategy/0:7e4d84423acf3121b42113d669fc87be010ff3926d0ba007874663e53a912197)
-
 ![Sample Strategy 4](docs/sample-strategy-4.png)
 
 This Strategy swaps any token from USDT/USDC/BRIDGE/QUBE/WBTC/WETH/DAI/PURR to WEVER and
@@ -176,7 +171,6 @@ sends them to sender. Very useful Strategy that can be user as a part of another
 MainNet address: `0:25b53ba5ebc425afabff4c5d9dd0772c5a03b838d8d364ab1c25bf57a5fd8d25`
 
 UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:25b53ba5ebc425afabff4c5d9dd0772c5a03b838d8d364ab1c25bf57a5fd8d25](https://strategy-builder-front.pages.dev/strategy/0:25b53ba5ebc425afabff4c5d9dd0772c5a03b838d8d364ab1c25bf57a5fd8d25)
-
 ![Sample Strategy 5](docs/sample-strategy-5.png)
 
 This Strategy swaps USDT/USDC to WEVER, send them to pool WEVER-BRIDGE and lock lp in farm.
@@ -191,7 +185,7 @@ This Strategy can be used for autofill pool from, where incoming tokens is some 
 
 This Strategy Builder can be used by users to create custom Strategy for their needs.
 It can be a deposit to farm in one transaction (instead of long way deposit+farm in UI),
-or automatic tool for diversification token into 3 stables in equal proportion.
+or automatic tool for diversification token into 3 stables in equal proportion
 
 ### Services
 
