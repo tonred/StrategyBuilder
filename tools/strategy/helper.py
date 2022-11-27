@@ -9,8 +9,6 @@ from tvmbase.utils.to_ever import to_ever
 
 from tools.strategy.models import AddressExtended, AmountExtended, InputKind, Command
 
-PERCENT_DENOMINATOR = 100_000
-
 EVERCLOUD_KEY = os.getenv('EVERCLOUD_KEY', '480fe4ee5f3e45ac85e6aa70505dc8dc')
 BUILDER_ABI_FILENAME = '../../build/StrategyBuilder.abi.json'
 STRATEGY_ABI_FILENAME = '../../build/Strategy.abi.json'
@@ -115,10 +113,6 @@ class Helper:
             'value': value,
             'flag': flag,
         }, parse=True)
-
-    @staticmethod
-    def to_percent(percent: float) -> int:
-        return int(percent * PERCENT_DENOMINATOR)
 
     @staticmethod
     def log_strategy(commands: dict[int, Command], inputs: dict[int, int], tokens_count: int):

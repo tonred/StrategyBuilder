@@ -32,6 +32,7 @@ abstract contract WalletManager {
         ITokenRoot(token).deployWallet{
             value: Gas.DEPLOY_WALLET_VALUE + Gas.DEPLOY_WALLET_GRAMS,
             flag: MsgFlag.SENDER_PAYS_FEES,
+            bounce: false,
             callback: WalletManager.onWalletDeployed
         }({
             owner: address(this),

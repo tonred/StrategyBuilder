@@ -6,6 +6,7 @@ class AddressExtendedKind(IntEnum):
     VALUE = 0
     SENDER = 1
     OWNER = 2
+    STRATEGY = 3
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,7 +46,7 @@ class InputKind(IntEnum):
 
 
 class CommandKind(IntEnum):
-    EXIT = 0
+    NOTHING = 0
     TRANSFER = 1
     SWAP = 2
     DEPOSIT = 3

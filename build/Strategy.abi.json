@@ -354,6 +354,7 @@
 		{
 			"name": "ReturnTokens",
 			"inputs": [
+				{"name":"token","type":"address"}
 			],
 			"outputs": [
 			]

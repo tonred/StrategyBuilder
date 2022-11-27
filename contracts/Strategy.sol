@@ -20,7 +20,7 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
     event ChangedOwner(address oldOwner, address newOwner);
     event ExecuteCommand(uint32 id);
     event ExecuteInput(uint32 id);
-    event ReturnTokens();
+    event ReturnTokens(address token);
 
     address public _root;
     address public _owner;
@@ -251,7 +251,7 @@ contract Strategy is TransferAction, SwapAction, DepositAction, FarmAction, Toke
     }
 
     function _returnTokens(address token, address sender, uint128 amount, bool force) private {
-        emit ReturnTokens();
+        emit ReturnTokens(token);
         if (token.value == 0) {
             sender.transfer({value: 0, flag: MsgFlag.ALL_NOT_RESERVED, bounce: false});
         } else {
