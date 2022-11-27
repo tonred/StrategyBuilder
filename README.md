@@ -40,8 +40,6 @@ Every command contains:
 * [optional] ID of child command that will be executed in callback of current command (for example, transfer **after** swap)
 * [optional] ID of next command that will be executed next in this transaction (for example, 2 swaps **in a row**)
 
-[//]: # (todo)
-
 ### Supported Commands
 
 | kind       | childID | description and params                                                                                                  | code                                                    |
@@ -114,14 +112,13 @@ npm run deploy-builder
 ```
 
 
-## Builder tools
+## UI and Tools
 
-[//]: # (todo link)
 There is UI for viewing and building strategies.
-You can insert any created strategy in (todo link)
-to view it DAG
+You can insert any created strategy in [https://strategy-builder-front.pages.dev](https://strategy-builder-front.pages.dev)
+and view it DAG. Moreover, you can execute any strategy directly from UI
 
-Moreover, there is simple Python tool for strategy building in [tools/strategy](tools/strategy).
+Besides, there is simple Python tool for strategy building in [tools/strategy](tools/strategy).
 Dot forget to install [requirements.txt](tools/requirements.txt) before.
 It already contains 5 sample strategy, that is describes in [Sample Strategies](#Sample-Strategies)
 
@@ -141,11 +138,9 @@ It is a pipeline "receive token + swap a preconfigured portion of them + optiona
 
 ### Swap to 3 stables
 
-[//]: # (todo)
-MainNet address: ``
+MainNet address: `0:35b5f401b1923644c93f5fbad2ee902f090febe794cd8cf1067f2794f9bcf362`
 
-[//]: # (todo)
-UI viewer link: []()
+UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:35b5f401b1923644c93f5fbad2ee902f090febe794cd8cf1067f2794f9bcf362](https://strategy-builder-front.pages.dev/strategy/0:35b5f401b1923644c93f5fbad2ee902f090febe794cd8cf1067f2794f9bcf362)
 
 ![Sample Strategy 2](docs/sample-strategy-2.png)
 
@@ -155,9 +150,9 @@ By the way, withdraw method is also implemented, see [Additional Functions](#Add
 
 ### Deposit and farm
 
-MainNet address: `0:dcdfdeaefca1c1d189a61317ce4b97f21fd6c7f73a6c9b25ddf68e16cfa2ecc4`
+MainNet address: `0:11c828b1c4ff5dd05e352ec1596c8b4c04ebdcfeb9aefa25043f9a1bbf2a7022`
 
-UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:dcdfdeaefca1c1d189a61317ce4b97f21fd6c7f73a6c9b25ddf68e16cfa2ecc4](https://strategy-builder-front.pages.dev/strategy/0:dcdfdeaefca1c1d189a61317ce4b97f21fd6c7f73a6c9b25ddf68e16cfa2ecc4)
+UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:11c828b1c4ff5dd05e352ec1596c8b4c04ebdcfeb9aefa25043f9a1bbf2a7022](https://strategy-builder-front.pages.dev/strategy/0:11c828b1c4ff5dd05e352ec1596c8b4c04ebdcfeb9aefa25043f9a1bbf2a7022)
 
 ![Sample Strategy 3](docs/sample-strategy-3.png)
 
@@ -167,9 +162,9 @@ It is a pipeline "receive token + swap in 50/50 proportion + provide liquidity t
 
 # Any to WEVER
 
-MainNet address: ``
+MainNet address: `0:7e4d84423acf3121b42113d669fc87be010ff3926d0ba007874663e53a912197`
 
-UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0](https://strategy-builder-front.pages.dev/strategy/0)
+UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:7e4d84423acf3121b42113d669fc87be010ff3926d0ba007874663e53a912197](https://strategy-builder-front.pages.dev/strategy/0:7e4d84423acf3121b42113d669fc87be010ff3926d0ba007874663e53a912197)
 
 [img]
 
@@ -178,9 +173,9 @@ sends them to sender. Very useful Strategy that can be user as a part of another
 
 # Fill pool
 
-MainNet address: ``
+MainNet address: `0:25b53ba5ebc425afabff4c5d9dd0772c5a03b838d8d364ab1c25bf57a5fd8d25`
 
-UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0](https://strategy-builder-front.pages.dev/strategy/0)
+UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:25b53ba5ebc425afabff4c5d9dd0772c5a03b838d8d364ab1c25bf57a5fd8d25](https://strategy-builder-front.pages.dev/strategy/0:25b53ba5ebc425afabff4c5d9dd0772c5a03b838d8d364ab1c25bf57a5fd8d25)
 
 [img]
 

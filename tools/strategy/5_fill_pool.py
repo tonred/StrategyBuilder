@@ -11,7 +11,7 @@ from tools.strategy.utils import to_percent, to_seconds
 
 
 async def main():
-    any_to_wever_strategy = '0:e7e80d1c4bb4bdc14ac75f7cc260698d13b8abad783bd6395c8ef2f4646a2cfa'
+    any_to_wever_strategy = '0:7e4d84423acf3121b42113d669fc87be010ff3926d0ba007874663e53a912197'
     fee_collector = '0:fa94171cb0565789224814561cc558e59315971ee9d03085de3dcb5f8b94d95e'
     wever = '0:a49cd4e158a9a15555e624759e2e4e766d22600b7800d891e46f9291f044a93d'
     bridge = '0:f2679d80b682974e065e03bf42bbee285ce7c587eb153b41d761ebfd954c45e1'
