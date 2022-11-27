@@ -4,7 +4,7 @@ Project Github: https://github.com/tonred/StrategyBuilder
 
 MainNet Strategy Builder: `0:bfa6edc24504f7e40904c8e8d9a942bd385b256a78f0f45000ca7b61016014bf`
 
-UI Builder and Viewer: [https://strategy-builder-front.pages.dev](https://strategy-builder-front.pages.dev)
+UI Viewer and Builder: [https://strategy-builder-front.pages.dev](https://strategy-builder-front.pages.dev)
 
 TG: @Abionics, @get_username
 
@@ -160,26 +160,43 @@ This Strategy add user WEVER to WEVER-USDT pool and lock lp in farm. **Owner of 
 Besides, this Strategy take 5% fee that sends to Strategy owner balance. 
 It is a pipeline "receive token + swap in 50/50 proportion + provide liquidity to pool + receive LP + lock LP into farming pool + claim rewards method with optional recipient address" from challenge.
 
-# Any to WEVER
+### Any to WEVER
 
 MainNet address: `0:7e4d84423acf3121b42113d669fc87be010ff3926d0ba007874663e53a912197`
 
 UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:7e4d84423acf3121b42113d669fc87be010ff3926d0ba007874663e53a912197](https://strategy-builder-front.pages.dev/strategy/0:7e4d84423acf3121b42113d669fc87be010ff3926d0ba007874663e53a912197)
 
-[img]
+![Sample Strategy 4](docs/sample-strategy-4.png)
 
 This Strategy swaps any token from USDT/USDC/BRIDGE/QUBE/WBTC/WETH/DAI/PURR to WEVER and
 sends them to sender. Very useful Strategy that can be user as a part of another Strategy (see next sample)
 
-# Fill pool
+### Fill pool
 
 MainNet address: `0:25b53ba5ebc425afabff4c5d9dd0772c5a03b838d8d364ab1c25bf57a5fd8d25`
 
 UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:25b53ba5ebc425afabff4c5d9dd0772c5a03b838d8d364ab1c25bf57a5fd8d25](https://strategy-builder-front.pages.dev/strategy/0:25b53ba5ebc425afabff4c5d9dd0772c5a03b838d8d364ab1c25bf57a5fd8d25)
 
-[img]
+![Sample Strategy 5](docs/sample-strategy-5.png)
 
 This Strategy swaps USDT/USDC to WEVER, send them to pool WEVER-BRIDGE and lock lp in farm.
 This is a sample how one Strategy can use another. The owner of lp and reward is Strategy. If owner
 wants to claim reward, he can call `claim` method in Strategy (see [Additional Functions](#Additional-Functions)).
 This Strategy can be used for autofill pool from, where incoming tokens is some commissions in some service
+
+
+## Use Cases
+
+### Users
+
+This Strategy Builder can be used by users to create custom Strategy for their needs.
+It can be a deposit to farm in one transaction (instead of long way deposit+farm in UI),
+or automatic tool for diversification token into 3 stables in equal proportion.
+
+### Services
+
+This Strategy Builder is very useful for onchain operations. Instead of writing custom code
+for basic operations, service can deploy Strategy and use it. There is some examples:
+* Auto burn tokens (swap to wever, unwrap and send to black hole) - can be used in DeNS and EverStart
+* Swapping TIP3 tokens for gas - can be used in Adaever and maybe in Bridge
+* [Swapping any token to WEVER](#Any-to-WEVER) - can be used in launchpads like EverStart
