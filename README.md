@@ -45,8 +45,8 @@ Every command contains:
 | kind       | childID | description and params                                                                                                  | code                                                    |
 |------------|---------|-------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------|
 | `NOTHING`  | -       | Empty command, can be used for empty callback (exit) or as a mock in `TokenInput`                                       | -                                                       |
-| `TRANSFER` | +       | Transfer TIP3 token to recipient <br> **Params:** amount, recipient, isDeployWallet, payload, value (send), flag (send) | [Transfer.sol](contracts/commands/actions/Transfer.sol) |
-| `SWAP`     | -       | Swap token in pair <br> **Params:** to (token root), amount, value (send), flag (send)                                  | [Swap.sol](contracts/commands/actions/Swap.sol)         |
+| `TRANSFER` | -       | Transfer TIP3 token to recipient <br> **Params:** amount, recipient, isDeployWallet, payload, value (send), flag (send) | [Transfer.sol](contracts/commands/actions/Transfer.sol) |
+| `SWAP`     | +       | Swap token in pair <br> **Params:** to (token root), amount, value (send), flag (send)                                  | [Swap.sol](contracts/commands/actions/Swap.sol)         |
 | `DEPOSIT`  | +       | Deposit liquidity to pool <br> **Params:** second (token root), amount, lp (token root), value (send), flag (send)      | [Deposit.sol](contracts/commands/actions/Deposit.sol)   |
 | `FARM`     | -       | Deposit lp tokens to farming <br> **Params:** amount, farm, depositOwner, lockTime, value (send), flag (send)           | [Farm.sol](contracts/commands/actions/Farm.sol)         |
 
@@ -115,7 +115,9 @@ There is UI for viewing and building strategies.
 You can insert any created strategy in [https://strategy-builder-front.pages.dev](https://strategy-builder-front.pages.dev)
 and view it DAG. Moreover, you can execute any strategy directly from UI
 
-[//]: # (todo builder image)
+Currently, builder (UI) support only 2 commands and input. So we created some ready Strategies,
+check them in [Sample Strategies](#Sample-Strategies)
+![Strategy Builder](docs/strategy-builder.png)
 
 Besides, there is simple Python tool for strategy building in [tools/strategy](tools/strategy).
 Dot forget to install [requirements.txt](tools/requirements.txt) before.
