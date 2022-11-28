@@ -53,7 +53,7 @@ async def main():
     wever_input_data = await helper.encode_token_input_data(wever, min_amount=10, min_gas=to_ever(8.9))
     commands = {
         1: Command(CommandKind.TRANSFER, any_to_wever_data),
-        2: Command(CommandKind.NOTHING, wever_input_data, next_id=3),
+        2: Command(CommandKind.INPUT, wever_input_data, next_id=3),
         3: Command(CommandKind.TRANSFER, fee_data, next_id=4),
         4: Command(CommandKind.DEPOSIT, deposit_data, child_id=5),
         5: Command(CommandKind.FARM, farm_data),
@@ -66,7 +66,7 @@ async def main():
     inputs = {input_hash: 2}
     for index, token in enumerate(tokens, start=6):
         input_data = await helper.encode_token_input_data(token, min_amount=100, min_gas=to_ever(9.4))
-        commands[index] = Command(CommandKind.NOTHING, input_data, next_id=1)
+        commands[index] = Command(CommandKind.INPUT, input_data, next_id=1)
         input_hash = await helper.hash_token_input(
             kind=InputKind.TOKEN,
             token=token,

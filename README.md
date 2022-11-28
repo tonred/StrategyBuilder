@@ -138,9 +138,9 @@ It is a pipeline _"receive token + swap a preconfigured portion of them + option
 
 ### Swap to 3 stables
 
-MainNet address: `0:35b5f401b1923644c93f5fbad2ee902f090febe794cd8cf1067f2794f9bcf362`
+MainNet address: `0:0f73fe08390eae7071dc091bdbafb7b456e347688e1ca64d94c8503f77199605`
 
-UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:35b5f401b1923644c93f5fbad2ee902f090febe794cd8cf1067f2794f9bcf362](https://strategy-builder-front.pages.dev/strategy/0:35b5f401b1923644c93f5fbad2ee902f090febe794cd8cf1067f2794f9bcf362)
+UI viewer link: [https://strategy-builder-front.pages.dev/strategy/0:0f73fe08390eae7071dc091bdbafb7b456e347688e1ca64d94c8503f77199605](https://strategy-builder-front.pages.dev/strategy/0:0f73fe08390eae7071dc091bdbafb7b456e347688e1ca64d94c8503f77199605)
 ![Sample Strategy 2](docs/sample-strategy-2.png)
 
 This Strategy swap any amount WEVER to USDT + USDC + DAI in equal proportion (33.3%).

@@ -41,7 +41,7 @@ async def main():
     inputs = dict()
     for index, token in enumerate(tokens, start=3):
         input_data = await helper.encode_token_input_data(token, min_amount=10, min_gas=to_ever(2.2))
-        commands[index] = Command(CommandKind.NOTHING, input_data, next_id=1)
+        commands[index] = Command(CommandKind.INPUT, input_data, next_id=1)
         input_hash = await helper.hash_token_input(
             kind=InputKind.TOKEN,
             token=token,

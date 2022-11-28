@@ -40,7 +40,7 @@ async def main():
         flag=128,
     )
     commands = {
-        1: Command(CommandKind.NOTHING, input_data, next_id=2),
+        1: Command(CommandKind.INPUT, input_data, next_id=2),
         2: Command(CommandKind.TRANSFER, fee_data, next_id=3),
         3: Command(CommandKind.DEPOSIT, deposit_data, child_id=4),
         4: Command(CommandKind.FARM, farm_data),

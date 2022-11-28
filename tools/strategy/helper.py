@@ -123,3 +123,4 @@ class Helper:
         print(f'\tinputs: {inputs}')
         print(f'[NONCE]: <nonce>')
         print(f'[msg.value]: {value}')
+        print(f'Strategy Builder address: {BUILDER_ADDRESS}')

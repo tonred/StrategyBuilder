@@ -46,7 +46,7 @@ class InputKind(IntEnum):
 
 
 class CommandKind(IntEnum):
-    NOTHING = 0
+    INPUT = 0
     TRANSFER = 1
     SWAP = 2
     DEPOSIT = 3

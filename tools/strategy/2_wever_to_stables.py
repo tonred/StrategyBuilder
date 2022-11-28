@@ -38,11 +38,12 @@ async def main():
     transfer_data = await helper.encode_transfer_data(
         amount=AmountExtended(AmountExtendedKind.PERCENT, to_percent(1)),
         recipient=AddressExtended(AddressExtendedKind.SENDER, ZERO_ADDRESS),
+        is_deploy_wallet=True,
         value=0,
         flag=128,
     )
     commands = {
-        1: Command(CommandKind.NOTHING, input_data, next_id=2),
+        1: Command(CommandKind.INPUT, input_data, next_id=2),
         2: Command(CommandKind.SWAP, usdt_swap_data, child_id=5, next_id=3),
         3: Command(CommandKind.SWAP, usdc_swap_data, child_id=5, next_id=4),
         4: Command(CommandKind.SWAP, dai_swap_data, child_id=5),

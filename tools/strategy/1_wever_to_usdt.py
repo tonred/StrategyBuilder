@@ -28,7 +28,7 @@ async def main():
         flag=128,
     )
     commands = {
-        1: Command(CommandKind.NOTHING, input_data, next_id=2),
+        1: Command(CommandKind.INPUT, input_data, next_id=2),
         2: Command(CommandKind.SWAP, swap_data, child_id=3),
         3: Command(CommandKind.TRANSFER, transfer_data),
     }
